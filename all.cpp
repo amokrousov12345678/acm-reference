@@ -196,7 +196,7 @@ bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Poin
 	if (abs(det) < EPS) return false;
 	detu /= det;
 	detv /= det;
-	Point c = a1 + (a2 - a1) * detu;
+	Point c = a1 + (b1 - a1) * detu;
 	res = c;
 	return true;
 }
