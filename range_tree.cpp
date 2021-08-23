@@ -70,24 +70,19 @@ struct rmq_rm_t { // ***** RMQ with interval modification support *****
 };
 
 // **************************** Fenvik tree ****************************
-struct fenv_t {
-	val_t mas[size];
-	fenv_t() {}
-	fenv_t(int sz, val_t *a) {
-		int i;
-		for (mas[0] = 0, i = 0; i < sz; ++i) mas[i + 1] = mas[i] + a[i];
-		for ( ; i < size-1; ++i) mas[i + 1] = mas[i];
-		for (i = size - 1; i > 0; --i) mas[i] -= mas[i & (i - 1)];
-	}
-	void modify(int ind, val_t val) {
-		for (ind++; ind < size; ind = (ind << 1) - (ind & (ind - 1))) mas[ind] += val;
-	}
-	val_t query(int r) {
-		val_t ans = val_t();
-		for ( ; r > 0; r = r & (r - 1)) ans += mas[r];
-		return ans;
-	}	
-	val_t query(int l, int r) {
-		return query(r) - query(l);
-	}
+struct fenvic_t { //for multiple dimensions loops by each index
+    val_t mas[size];
+    fenvic_t() {};
+    void modify(int ind_, val_t val) {
+        for (int ind = ind_; ind < size; ind = (ind | (ind+1))) mas[ind] += val;
+    }
+    val_t query(int ind_) {
+        if (r<0) return val_t();
+        val_t ans = val_t();
+        for (int ind = ind_; ind >= 0; ind = (ind & (ind+1)) - 1) ans += mas[ind];
+        return ans;
+    }
+    val_t query(int l, int r) {
+        return query(r) - query(l-1);
+    }
 };
