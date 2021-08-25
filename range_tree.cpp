@@ -7,6 +7,7 @@ const int inf = 0x3f3f3f3f;
 typedef int val_t;
 const int size = 1 << 17;
 
+//for recursion array mas[size<<2] and ALL methods should be recursive (modify, etc, etc)
 struct rmq_t { // ********* RMQ without interval modification *********
 	val_t mas[size << 1];
 	rmq_t() {}
@@ -77,7 +78,7 @@ struct fenvic_t { //for multiple dimensions loops by each index
         for (int ind = ind_; ind < size; ind = (ind | (ind+1))) mas[ind] += val;
     }
     val_t query(int ind_) {
-        if (r<0) return val_t();
+        if (ind_<0) return val_t();
         val_t ans = val_t();
         for (int ind = ind_; ind >= 0; ind = (ind & (ind+1)) - 1) ans += mas[ind];
         return ans;

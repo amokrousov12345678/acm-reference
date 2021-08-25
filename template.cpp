@@ -7,6 +7,17 @@
 #pragma GCC target("avx,avx2,fma")
 #pragma GCC optimization ("unroll-loops")
 
+#include <ext/pb_ds/assoc_container.hpp> // Общий файл.
+#include <ext/pb_ds/tree_policy.hpp> // Содержит класс tree_order_statistics_node_update
+using namespace __gnu_pbds;
+typedef tree<
+        int,
+        __gnu_pbds::null_type,
+        less<int>,
+        __gnu_pbds::rb_tree_tag,
+        __gnu_pbds::tree_order_statistics_node_update>
+        ordered_set; //find_by_order and order_of_key
+
 using namespace std;
 #ifdef ILIKEGENTOO
 void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
