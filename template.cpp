@@ -39,5 +39,6 @@ int main() {
     cout.tie(0);
     ios_base::sync_with_stdio(false);
 	cout << setprecision(15) << fixed;
+	//((float)(clock() - t0)) / CLOCKS_PER_SEC
     return 0;
 }
