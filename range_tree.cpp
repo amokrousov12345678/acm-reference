@@ -7,7 +7,6 @@ const int inf = 0x3f3f3f3f;
 typedef int val_t;
 const int size = 1 << 17;
 
-//for recursion array mas[size<<2] and ALL methods should be recursive (modify, etc, etc)
 struct rmq_t { // ********* RMQ without interval modification *********
 	val_t mas[size << 1];
 	rmq_t() {}
@@ -85,5 +84,58 @@ struct fenvic_t { //for multiple dimensions loops by each index
     }
     val_t query(int l, int r) {
         return query(r) - query(l-1);
+    }
+};
+
+//for recursive, we need recreate vertices on ANY change, even when push (otherwise children are desync)
+struct segtree {
+    val_t mas[4*size]; const static val_t neutral = 0;
+    pval_t def[4*size]; const static pval_t neutralUpdate = 0;
+  
+    val_t applyUpdate(val_t val, val_t push) {};
+    val_t rqOp(val_t lhs, val_t rhs) {}
+    val_t combineUpdates(val_t cur, val_t fromUp) {return cur+fromUp;};
+
+    void build(int* vals, int n, int v = 1, int l = 0, int r = size-1) {
+        if (l==r) {
+            mas[v] = l<n ? vals[l] : neutral;
+            def[v] = neutralUpdate;
+            return;
+        }
+        int m = (l+r)/2;
+        build(vals, n, 2*v, l, m);
+        build(vals, n, 2*v+1, m+1, r);
+        mas[v] = rqOp(applyUpdate(mas[2*v], def[2*v]), applyUpdate(mas[2*v+1], def[2*v+1]));
+        def[v] = neutralUpdate;
+    }
+    void push(int v) { /*push(Node*&)*/
+        def[2*v] = combineUpdates(def[2*v], def[v]);
+        def[2*v+1] = combineUpdates(def[2*v+1], def[v]);
+        def[v] = neutralUpdate;
+    }
+
+    void update(int rq_l, int rq_r, val_t val, int v = 1, int l = 0, int r = size-1) {
+        if (l > rq_r || r < rq_l) return;
+        if (rq_l <= l && r <= rq_r) {
+            def[v] = combineUpdates(def[v], val);
+            return;
+        }
+        push(v);
+        int m = (l+r)/2;
+        update(rq_l, rq_r, val, 2*v, l, m);
+        update(rq_l, rq_r, val, 2*v+1, m+1, r);
+        mas[v] = rqOp(applyUpdate(mas[2*v], def[2*v]), applyUpdate(mas[2*v+1], def[2*v+1]));
+    }
+
+    /*pair<val_t, Node*>*/val_t query(int rq_l, int rq_r, int v = 1, int l = 0, int r = size-1) {
+        if (l > rq_r || r < rq_l) return neutral;
+        if (rq_l <= l && r <= rq_r) {
+            return applyUpdate(mas[v], def[v]);
+        }
+        push(v);
+        int m = (l+r)/2;
+        auto ans = rqOp(query(rq_l, rq_r, 2*v, l, m), query(rq_l, rq_r, 2*v+1, m+1, r));
+        mas[v] = rqOp(applyUpdate(mas[2*v], def[2*v]), applyUpdate(mas[2*v+1], def[2*v+1]));
+        return ans;
     }
 };
