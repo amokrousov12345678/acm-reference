@@ -34,6 +34,8 @@ typedef long long int64;
 const int infI = 0x3f3f3f3f;
 const int infLL = 0x3f3f3f3f3f3f3f3f;
 
+uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
+
 int main() {
 	cin.tie(0);
     cout.tie(0);
