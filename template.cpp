@@ -44,3 +44,6 @@ int main() {
 	//((float)(clock() - t0)) / CLOCKS_PER_SEC
     return 0;
 }
+
+//euler formula: n - m + f = 2, m <= 3*n-6
+//
