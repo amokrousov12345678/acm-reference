@@ -1,6 +1,8 @@
 // ********************* Suffix array construction *********************
-char st[maxl];
-int ind[maxl], nind[maxl], val[20][maxl], cnt[maxl], cc, log_2, l;
+char st[maxl]; //input str ('\0') terminated and with $ at end
+int ind[maxl]; //res
+int nind[maxl], cnt[maxl], cc, log_2, l;
+int val[20][maxl]; //val[k][n] - id of equivalence class of [pos; pos+2^k) among strings of such len
 
 void build_mass() {
 	int i, j;
@@ -27,7 +29,7 @@ void build_mass() {
 	}
 }
 
-int lcp(int i, int j) {
+int lcp(int i, int j) { //suf start at i and at j
 	int ans = 0, k;
 	for(k = log_2 - 1; k >= 0; --k)
 		if(val[k][i] == val[k][j]) {
@@ -37,3 +39,35 @@ int lcp(int i, int j) {
 		}
 	return ans;
 }
+
+int lcps[maxl], lcpLifts[20][maxl], pos[maxl]; //pos - inv of ind[], lcps - of adj
+void build_lcp() {
+	for (int i = 0; i < l; ++i) pos[ind[i]] = i;
+	int k = 0;
+	for (int i = 0; i < l; ++i) {
+		if (k > 0) k--;
+		if (pos[i] == l - 1) {
+			lcps[l - 1] = -1; k = 0; continue;
+		} else {
+			int j = ind[pos[i] + 1];
+			while (max(i + k,j + k) < l && st[(i + k) % l] == st[(j + k) % l]) ++k;
+			lcps[pos[i]] = k;
+		}
+	}
+
+	for (int i=0;i<l;i++) lcpLifts[0][i] = lcps[i];
+	int sz = 2;
+	for (int i=1;i<=log_2;i++) {
+		for (int j = 0; j + sz <= l; j++)
+			lcpLifts[i][j] = min(lcpLifts[i - 1][j], lcpLifts[i - 1][j + sz / 2]);
+		sz <<= 1;
+	}
+}
+
+int lcpKasai(int i, int j) { //lcp.rmq[pos(i);pos(j)) O(1) sparse table
+	i = pos[i]; j = pos[j]; if (i>j) swap(i,j);
+	if (i==j) return l;
+	int t = __lg(j-i);
+	return min(lcpLifts[t][i], lcpLifts[t][j - (1 << t)]);
+}
+//TBD: kasai
