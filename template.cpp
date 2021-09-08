@@ -7,15 +7,11 @@
 #pragma GCC target("avx,avx2,fma")
 #pragma GCC optimization ("unroll-loops")
 
-#include <ext/pb_ds/assoc_container.hpp> // Общий файл.
-#include <ext/pb_ds/tree_policy.hpp> // Содержит класс tree_order_statistics_node_update
+#include <ext/pb_ds/assoc_container.hpp> // Main file
+#include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
 using namespace __gnu_pbds;
-typedef tree<
-        int,
-        __gnu_pbds::null_type,
-        less<int>,
-        __gnu_pbds::rb_tree_tag,
-        __gnu_pbds::tree_order_statistics_node_update>
+typedef tree<int, __gnu_pbds::null_type, less<int>, __gnu_pbds::rb_tree_tag, 
+		__gnu_pbds::tree_order_statistics_node_update>
         ordered_set; //find_by_order and order_of_key
 
 using namespace std;
@@ -46,4 +42,4 @@ int main() {
 }
 
 //euler formula: n - m + f = 2, m <= 3*n-6
-//
+//simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x(2n-1))+f(x(2n)))*h/3
