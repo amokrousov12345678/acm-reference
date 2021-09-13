@@ -1,4 +1,4 @@
-// ********************* Suffix array construction *********************
+// ************** Suffix array construction (checked) *********************
 char st[maxl]; //input str ('\0') terminated and with $ at end
 int ind[maxl]; //res
 int nind[maxl], cnt[maxl], cc, log_2, l;
@@ -70,4 +70,3 @@ int lcpKasai(int i, int j) { //lcp.rmq[pos(i);pos(j)) O(1) sparse table
 	int t = __lg(j-i);
 	return min(lcpLifts[t][i], lcpLifts[t][j - (1 << t)]);
 }
-//TBD: kasai
