@@ -43,3 +43,6 @@ int main() {
 
 //euler formula: n - m + f = 2, m <= 3*n-6
 //simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x(2n-1))+f(x(2n)))*h/3
+//For tight ML: c++ io, vectors have very low impact (about 100kb). But compiler version/bitness is important factor
+
+//TODO: add HLD to reference!!!!1
