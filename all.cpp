@@ -57,7 +57,6 @@ inline int vect(const Point &a, const Point &b) {
 inline int scal(const Point &a, const Point &b) {
 	return a.x * b.x + a.y * b.y;
 }
-
 // comparing by polar angle, <*this> and <b> MUST BE NONZERO
 inline bool Point::operator < (const Point &b) const {
 	int th = half();
@@ -66,8 +65,7 @@ inline bool Point::operator < (const Point &b) const {
 	int pv = vect(*this, b);
 	return pv > 0;
 }
-
-// decides whether <p> is inside the oriented angle (<a>-<b>) (including bounds)
+// decides whether <p> is inside the oriented CCW angle (from <a> to <b>) (including bounds)
 // both <a> and <b> are nonzero
 bool inSector(const Point &a, const Point &b, const Point &p) {
 	int vab = vect(a, b);
@@ -75,47 +73,44 @@ bool inSector(const Point &a, const Point &b, const Point &p) {
 	if (vab >= 0) return (vect(a, p) >= 0 && vect(p, b) >= 0);
 	else		  return (vect(a, p) >= 0 || vect(p, b) >= 0);
 }
-
-inline bool CrossSegs(int l1, int r1, int l2, int r2) {//1 dimensional
+inline bool Cross1DSegs(int l1, int r1, int l2, int r2) {//1 dimensional
 	if (l1 > r1) swap(l1, r1);
 	if (l2 > r2) swap(l2, r2);
 	return !(l1 > r2 || r1 < l2);
 }
-
 // crosses two closed line segments <p1>-<p2> and {p3>-<p4>
-bool CrossLineLine(const Point &p1, const Point &p2, const Point &p3, const Point &p4) {
-	int a11 = p2.x - p1.x;
-	int a12 = p3.x - p4.x;
-	int a21 = p2.y - p1.y;
-	int a22 = p3.y - p4.y;
-	int b1  = p3.x - p1.x;
-	int b2  = p3.y - p1.y;
-	int det  = a11 * a22 - a12 * a21;
-	int detu =  b1 * a22 - a12 *  b2;
-	int detv = a11 *  b2  - b1 * a21;
-	if (det == 0) {
-		if (detu || detv) return false;
-		if (p1.x != p2.x || p3.x != p4.x) return CrossSegs(p1.x, p2.x, p3.x, p4.x);
-		if (p1.y != p2.y || p3.y != p4.y) return CrossSegs(p1.y, p2.y, p3.y, p4.y);
-		return (p1 == p3);
-	}
-	if (det < 0) {
-		det = -det;
-		detu = -detu;
-		detv = -detv;
-	}
-	return (detu >= 0 && detu <= det && detv >= 0 && detv <= det);
+bool CrossSegs(const Point &a1, const Point &b1, const Point &a2, const Point &b2) {
+    int a11 = b1.x - a1.x;
+    int a12 = a2.x - b2.x;
+    int a21 = b1.y - a1.y;
+    int a22 = a2.y - b2.y;
+    int xb1  = a2.x - a1.x;
+    int xb2  = a2.y - a1.y;
+    int det  = a11 * a22 - a12 * a21;
+    int detu = xb1 * a22 - a12 * xb2;
+    int detv = a11 * xb2 - xb1 * a21;
+    if (det == 0) {
+        if (detu || detv) return false;
+        if (a1.x != b1.x || a2.x != b2.x) return Cross1DSegs(a1.x, b1.x, a2.x, b2.x);
+        if (a1.y != b1.y || a2.y != b2.y) return Cross1DSegs(a1.y, b1.y, a2.y, b2.y);
+        return (a1 == a2);
+    }
+    if (det < 0) {
+        det = -det;
+        detu = -detu;
+        detv = -detv;
+    }
+    return (detu >= 0 && detu <= det && detv >= 0 && detv <= det);
 }
-
 // determines whether point <p> lies on the closed segment <a>-<b>
-inline bool onLine(const Point &p, const Point &a, const Point &b) {
+inline bool onSeg(const Point &p, const Point &a, const Point &b) {
 	if (vect(p - a, b - a)) return false;
 	if (a == b) return p == a;
 	return (scal(p - a, b - a) >= 0 && scal(p - b, a - b) >= 0);
 }
 
 // determines whether a point <p> is inside the triangle <a>-<b>-<c>
-// does not work for triangles with zero area
+// does not work for triangles with zero area (NOT CHECKED)
 inline int uabs(int a) { return (a < 0 ? -a : a); }
 inline bool inTriangle(const Point &p, const Point &a, const Point &b, const Point &c, bool strict = false) {
 	int tv = uabs(vect(c - a, b - a));
@@ -132,17 +127,17 @@ inline bool inTriangle(const Point &p, const Point &a, const Point &b, const Poi
 }
 
 // determines whether point <p> lies inside polygon <arr[0], ..., arr[n]>
-// no self-crossings!	may have equal points	arr[0] = arr[n]
+// no self-crossings! But may be non-convex. May have equal points	arr[0] = arr[n]
 bool inPolygon(const Point &p, int n, const Point *arr, bool strict = false) {
     //	if lies on the border
-	for (int i = 0; i < n; ++i) if (onLine(p, arr[i], arr[i + 1])) return !strict;
+	for (int i = 0; i < n; ++i) if (onSeg(p, arr[i], arr[i + 1])) return !strict;
 	Point spot = p + Point(15013, 15017); // BIG PRIMES: 1061109589 / 1061109601
 	int cnt = 0;
-	for (int i = 0; i < n; ++i) if (CrossLineLine(spot, p, arr[i], arr[i + 1])) cnt ^= 1;
+	for (int i = 0; i < n; ++i) if (CrossSegs(spot, p, arr[i], arr[i + 1])) cnt ^= 1;
 	return bool(cnt);
 }
 
-// Graham's convex hull
+// Graham's convex hull (DOESN'T WORK)
 // changes order of points! no equal points allowed! must have nonzero area
 Point hctr;
 bool cmpHull(const Point &a, const Point &b) {
@@ -152,9 +147,10 @@ bool cmpHull(const Point &a, const Point &b) {
     if (tv) return tv > 0;
     return ad.len2() < bd.len2();
 }
+//out k - size of convex hull in res, points CCW in res
 void ConvexHull(int n, Point *arr, int &k, Point *res, bool strict = true) {
-    int i;
-    int best = 0;
+	if (n<=2) {k = n; memcpy(res, arr, sizeof(Point)*n); return;};
+    int i, best = 0;
     for (i = 1; i<n; i++) {
         if (arr[i].x < arr[best].x) best = i;
         if (arr[i].x == arr[best].x && arr[i].y < arr[best].y) best = i;
@@ -173,16 +169,14 @@ void ConvexHull(int n, Point *arr, int &k, Point *res, bool strict = true) {
     if (!strict) {
         k--;
         for (i = n-1; i>0; i--) {
-            Page 18 of 25
                 res[k++] = arr[i];
             if (vect(arr[i]-arr[0], arr[i-1]-arr[0]) != 0) break;
         }
     }
 }
 
-
-//real_t point
-//Line crosses Line (infinite)
+//THIS AND LATER FUNCTIONS needs real_t point, DONT forget to change ALL types to double
+//Line crosses Line (a1,b1 - one line, a2,b2 - other line) (infinite)
 bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Point &b2, Point &res) {
 	real_t a11 = b1.x - a1.x;
 	real_t a12 = a2.x - b2.x;
@@ -193,15 +187,14 @@ bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Poin
 	real_t det  = a11 * a22 - a12 * a21;
 	real_t detu = xb1 * a22 - a12 * xb2;
 	real_t detv = a11 * xb2 - xb1 * a21;
-	if (abs(det) < EPS) return false;
+	if (abs(det) < eps) return false; //parallel (detu!=0) or coincide (detu=0)	
 	detu /= det;
 	detv /= det;
 	Point c = a1 + (b1 - a1) * detu;
 	res = c;
 	return true;
 }
-
-//Line crosses Circle (infinite)
+//Line (la, lb) crosses Circle (center cc, radius cr) (infinite)
 bool CrossLineCircle(const Point &la, const Point &lb, const Point &cc, real_t cr, Point &res1, Point &res2) {
 	Point st = la - cc;
 	Point dir = lb - la;
@@ -209,7 +202,7 @@ bool CrossLineCircle(const Point &la, const Point &lb, const Point &cc, real_t c
 	real_t qb = 2.0 * scal(st, dir);
 	real_t qc = scal(st, st) - cr * cr;
 	real_t qd = qb * qb - 4.0 * qa * qc;
-	if (qd < -EPS) return false;
+	if (qd < -eps) return false;
 	if (qd < 0.0) qd = 0.0;
 	qd = sqrt(qd);
 	real_t x1 = (-qb - qd) / (2.0 * qa);
@@ -218,15 +211,14 @@ bool CrossLineCircle(const Point &la, const Point &lb, const Point &cc, real_t c
 	res2 = la + dir * x2;
 	return true;
 }
-
-//Circle crosses Circle
+//Circle (center c1, radius r1) crosses Circle (center c2, radius r2)
 bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, Point &res1, Point &res2) {
 	real_t la = 2.0 * (c2.x - c1.x);
 	real_t lb = 2.0 * (c2.y - c1.y);
 	real_t lc = sqr(c1.x) - sqr(c2.x) + sqr(c1.y) - sqr(c2.y) + sqr(r2) - sqr(r1);
-	if (la * la + lb * lb < EPS) return false;
+	if (la * la + lb * lb < eps) return false; //circle or coincide or no intersection (based on radius)
 	Point a, b;
-	if (abs(la) > abs(lb)) {
+	if (abs(la) > abs(lb)) { //Logic can be used to build 2 points based on normal line equation
 		a = Point(-lc / la, 0.0);
 		b = Point(-(lb + lc) / la, 1.0);
 	}
@@ -275,8 +267,7 @@ bool GetSolution() { // gets the solution
 	return true;
 }
 
-// ********************* Integer polynom dividing **********************
-////1
+// ********************* Integer polynom dividing (not checked) **********************
 struct Poly {
 	int deg;
 	int arr[SIZE];
