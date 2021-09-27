@@ -40,7 +40,7 @@ int lcp(int i, int j) { //suf start at i and at j
 	return ans;
 }
 
-int lcps[maxl], lcpLifts[20][maxl], pos[maxl]; //pos - inv of ind[], lcps - of adj
+int lcps[maxl], lcpLifts[20][maxl], pos[maxl]; //pos - inv of ind[], lcps - of adj in lex order
 void build_lcp() {
 	for (int i = 0; i < l; ++i) pos[ind[i]] = i;
 	int k = 0;
