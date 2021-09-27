@@ -175,7 +175,7 @@ void ConvexHull(int n, Point *arr, int &k, Point *res, bool strict = true) {
     }
 }
 
-//THIS AND LATER FUNCTIONS needs real_t point, DONT forget to change ALL types to double
+//THIS AND LATER FUNCTIONS needs real_t point, DONT forget to change ALL types EVERYWHERE to double
 //Line crosses Line (a1,b1 - one line, a2,b2 - other line) (infinite)
 bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Point &b2, Point &res) {
 	real_t a11 = b1.x - a1.x;
