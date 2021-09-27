@@ -27,7 +27,7 @@ for (int s = m; ;s = (s - 1) & m) {
     if (!s) break;
 }
 
-// ***************************** Geometry ******************************
+//***************************** Geometry *******************
 struct Point { //integer point
 	int x, y;
 	inline Point() : x(0), y(0) {}
@@ -46,7 +46,7 @@ struct Point { //integer point
 	inline bool operator == (const Point &b) const {
 		return x == b.x && y == b.y;
 	}
-	inline bool half() const {
+	inline bool half() const { //true if in lower halfspace
 		return (y < 0 || (y == 0 && x < 0));
 	}
 	inline bool operator < (const Point &b) const;
@@ -76,7 +76,7 @@ bool inSector(const Point &a, const Point &b, const Point &p) {
 	else		  return (vect(a, p) >= 0 || vect(p, b) >= 0);
 }
 
-inline bool CrossSegs(int l1, int r1, int l2, int r2) {
+inline bool CrossSegs(int l1, int r1, int l2, int r2) {//1 dimensional
 	if (l1 > r1) swap(l1, r1);
 	if (l2 > r2) swap(l2, r2);
 	return !(l1 > r2 || r1 < l2);
@@ -324,29 +324,6 @@ int LCA(int a, int b) {
 	}
 	if (a != b) a = father[0][a];
 	return a;
-}
-
-// ******************************* Levit *******************************
-vector<int> d(n, inf);
-d[v1] = 0;
-vector<int> id(n);
-deque<int> q;
-q.push_back(v1);
-vector<int> p(n, -1);
-while (!q.empty()) {
-	int v = q.front();
-	q.pop_front();
-	id[v] = 1;
-	for (size_t i = 0; i < g[v].size(); ++i) {
-		int to = g[v][i].first, len = g[v][i].second;
-		if (d[to] > d[v] + len) {
-			d[to] = d[v] + len;
-			if (id[to] == 0) q.push_back(to);
-			else if (id[to] == 1) q.push_front(to);
-			p[to] = v;
-			id[to] = 1;
-		}
-	}
 }
 
 // **************************** maxflow:lift ****************************

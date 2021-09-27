@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+//set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fsanitize=address -fsanitize=undefined")
+
 #pragma optimization_level 3
 #pragma GCC optimize("Ofast,no-stack-protector,unroll-loops,fast-math,O3")
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx")
@@ -44,5 +46,3 @@ int main() {
 //euler formula: n - m + f = 2, m <= 3*n-6
 //simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x(2n-1))+f(x(2n)))*h/3
 //For tight ML: c++ io, vectors have very low impact (about 100kb). But compiler version/bitness is important factor
-
-//TODO: add HLD to reference!!!!1

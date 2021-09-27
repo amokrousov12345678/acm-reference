@@ -1,6 +1,6 @@
 // ************** Suffix array construction (checked) *********************
 char st[maxl]; //input str ('\0') terminated and with $ at end
-int ind[maxl]; //res
+int ind[maxl]; //res (sufs numbers in lex order)
 int nind[maxl], cnt[maxl], cc, log_2, l;
 int val[20][maxl]; //val[k][n] - id of equivalence class of [pos; pos+2^k) among strings of such len
 
@@ -14,7 +14,7 @@ void build_mass() {
 	for (i = 0; i < 128; ++i) cnt[i + 1] += cnt[i];
 	for (i = 0; i < l; ++i) ind[cnt[st[i]]++] = i;
 	for (i = 1; i < l; ++i) val[0][ind[i]] = val[0][ind[i-1]] + (st[ind[i]] != st[ind[i - 1]]);
-	for (j = 0; j < log_2; ++j) {
+	for (j = 0; j < log_2; ++j) { //use val[j % 2], val[(j+1)%2] if need to save memory
 		cnt[0] = 0; cnt[cc = 1] = 1;
 		for (i = 1; i < l; ++i)
 			if (val[j][ind[i]] == val[j][ind[i - 1]]) ++cnt[cc];
@@ -23,7 +23,7 @@ void build_mass() {
 		int sz = (1 << j);
 		for (i = 0; i < l; ++i) nind[ cnt[val[j][(ind[i] - sz + l) % l]]++ ] = (ind[i] - sz + l) % l;
 		memcpy(ind, nind, sizeof(int) * l);
-		for(i = 1; i < l; ++i)
+		for(i = 1; i < l; ++i) 
 			val[j + 1][ind[i]] = val[j + 1][ind[i - 1]] + 
 			(val[j][ind[i]] != val[j][ind[i - 1]] || val[j][(ind[i] + sz) % l] != val[j][(ind[i - 1] + sz) % l]);
 	}

@@ -25,8 +25,7 @@ void z_function(const char *st, int *z) {
 		}
 	}
 }
-
-// Lyndon decomposition and minimal cyclical shift search in O(n)
+// Lyndon decomposition and minimal cyclical shift search in O(n) (NOT CHECKED)
 string min_cyclic_shift(string s) {
 	s += s;
 	int n = (int) s.length();
@@ -43,8 +42,7 @@ string min_cyclic_shift(string s) {
 	}
 	return s.substr(ans, n / 2);
 }
-
-// Palindromes
+// Palindromes (NOT CHECKED)
 int l = 0, r = -1;
 for (int i = 0; i < n; ++i) {
 	int k = (i > r ? 1 : min(d1[l + r - i], r - i));

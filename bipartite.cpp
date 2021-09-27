@@ -1,4 +1,5 @@
 // ********************* Match in bipartite graph **********************
+//TODO: rewrite to store both parts
 const int maxn = 1010;
 int who[maxn];
 bool was[maxn];

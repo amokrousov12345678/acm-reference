@@ -1,13 +1,13 @@
-// ************************* Ukkonen algorithm *************************
-const int maxa = 53;
-const int maxl = 1 << 17;
-char s[maxl];
+// ************************* Ukkonen algorithm (suf tree) ********
+const int maxa = 53; //alphabet size
+char s[maxl]; //input string (MUST $ and '\0' terminated) 
 
 struct node {
-	int k, p, suff;
-	int next[maxa];
+	int k, p, suff;//vert corresponds to [k;p) substr. Suff link: xA -> A 
+	int next[maxa];//first letter of transition (by def different)
 } tree[maxl * 2];
 int cnt, root, aux;
+
 int new_node(int k, int p) {
 	memset(tree + cnt, -1, sizeof(node));
 	tree[cnt].k = k; tree[cnt].p = p;

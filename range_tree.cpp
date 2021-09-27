@@ -1,12 +1,7 @@
 // **************************** Range trees ****************************
-//GRABLES:
-//if op isn't idempotent, must check l!=r before adding mas[r]
-//if query op is addition, we need store len[v] to scale impact of stored addition
-
 const int inf = 0x3f3f3f3f;
 typedef int val_t;
-const int size = 1 << 17;
-
+const int size = 1 << 17;//MUST BE power of 2
 struct rmq_t { // ********* RMQ without interval modification *********
 	val_t mas[size << 1];
 	rmq_t() {}
@@ -22,7 +17,7 @@ struct rmq_t { // ********* RMQ without interval modification *********
 	val_t query(int l, int r) {
 		if (l > r) return inf;
 		l += size; r += size;
-		val_t ans = min(mas[l], mas[r]);
+		val_t ans = mas[l]; if (l<r) ans = min(ans, mas[r]);
 		for ( ; l < r; l >>= 1, r >>= 1) {
 			if ((l & 1) == 0 && (l + 1) < r) ans = min(ans, mas[l + 1]);
 			if ((r & 1) == 1 && (r - 1) > l) ans = min(ans, mas[r - 1]);
@@ -30,7 +25,7 @@ struct rmq_t { // ********* RMQ without interval modification *********
 		return ans;
 	}
 };
-
+//if query op is addition, we need store len[v] to scale impact of stored addition
 struct rmq_rm_t { // ***** RMQ with interval modification support *****
 	val_t ans[size << 1], add[size << 1];
 	rmq_rm_t() { }
@@ -42,8 +37,7 @@ struct rmq_rm_t { // ***** RMQ with interval modification support *****
 	void modify(int l, int r, val_t val) {
 		if (l > r) return;
 		l += size; r += size;
-		add[l] += val;
-		if (l < r) add[r] += val;
+		add[l] += val; if (l < r) add[r] += val;
 		while (l > 0) {
 			if ((l & 1) == 0 && (l + 1) < r) add[l + 1] += val;
 			if ((r & 1) == 1 && (r - 1) > l) add[r - 1] += val;
@@ -68,7 +62,6 @@ struct rmq_rm_t { // ***** RMQ with interval modification support *****
 		return min(lans, rans);
 	}
 };
-
 // **************************** Fenvik tree ****************************
 struct fenvic_t { //for multiple dimensions loops by each index
     val_t mas[size];
@@ -86,7 +79,6 @@ struct fenvic_t { //for multiple dimensions loops by each index
         return query(r) - query(l-1);
     }
 };
-
 //for recursive, we need recreate vertices on ANY change, even when push (otherwise children are desync)
 struct segtree {
     val_t mas[4*size]; const static val_t neutral = 0;

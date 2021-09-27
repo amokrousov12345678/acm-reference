@@ -1,6 +1,7 @@
 // ******************* Cartesian tree implementation *******************
-typedef int fkey_t;
+typedef int fkey_t;//data key
 typedef int skey_t;
+//calculate f without pushes (or make them work)
 
 struct node {
     fkey_t pk;
