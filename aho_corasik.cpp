@@ -14,7 +14,7 @@ int new_node() {
 	memset(nodes + cnt, -1, sizeof(node));
 	return cnt++;
 }
-void init() { new_node(); } //MUST be called before use of trie
+void init() { cnt = 0; new_node(); } //MUST be called before use of trie
 void add_word(const char *st, int num) {
 	assert(cnt>0); word_lens[num] = strlen(st); int v; 
 	for (v = root; *st; ++st) {
