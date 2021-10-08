@@ -302,10 +302,10 @@ int n, s, t;
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
 //IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 //O(V^2*sqrt(E)), in practice often slower than Dinitz on arbitrary graph
-flow_t f[maxn][maxn]; //OUT (u,v) flow
+flow_t f[maxn][maxn]; //OUT f[u][v] - (u,v) flow
 flow_t e[maxn]; int h[maxn], maxh[maxn];
 	
-flow_t pushRelabel() {
+flow_t pushRelabel() {//returns flow amount
 	for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
 	for (int i = 0; i < n; ++i) {
 		f[s][i] = c[s][i]; f[i][s] = -f[s][i];
@@ -381,7 +381,7 @@ flow_t dfs (int v, flow_t flow) {
 	}
 	return 0;
 }
-flow_t dinic() {
+flow_t dinic() {//returns flow amount
 	for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
 	flow_t flow = 0;
 	for (;;) {

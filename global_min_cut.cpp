@@ -11,10 +11,10 @@ int w[maxn];
 bool exist[maxn], in_a[maxn];
 void mincut() {
 	for (int i = 0; i < n; ++i) v[i].assign(1, i);
-	memset(exist, true, sizeof exist);
+	memset(exist, true, sizeof(exist[0])*n);
 	for (int ph = 0; ph < n - 1; ++ph) {
-		memset(in_a, false, sizeof(in_a));
-		memset(w, 0, sizeof(w));
+		memset(in_a, false, sizeof(in_a[0])*n);
+		memset(w, 0, sizeof(w[0])*n);
 		for (int it = 0, prev; it < n - ph; ++it) {
 			int sel = -1;
 			for (int i = 0; i < n; ++i)
