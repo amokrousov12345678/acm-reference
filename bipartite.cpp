@@ -25,5 +25,3 @@ int kuhn(int n) {//try to match [1..n] (enough only one part, but may try ALL)
     }
     return cc;
 }
-
-//TODO: add Hopcroft-Carp

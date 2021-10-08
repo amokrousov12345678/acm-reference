@@ -6,9 +6,9 @@ cap_t g[maxn][maxn];//IN g[u][v] - weight (capacity) of (u,v)
 vector<int> best_cut;//OUT verts of one part (remaining are in other part)
 cap_t best_cost = INF;//OUT min sum weight of cutted edges between parts
 //auxillary arrays:
-vector<int> v[MAXN];
-int w[MAXN];
-bool exist[MAXN], in_a[MAXN];
+vector<int> v[maxn];
+int w[maxn];
+bool exist[maxn], in_a[maxn];
 void mincut() {
 	for (int i = 0; i < n; ++i) v[i].assign(1, i);
 	memset(exist, true, sizeof exist);
