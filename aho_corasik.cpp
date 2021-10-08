@@ -1,20 +1,20 @@
 #define numc(x) ((int)((unsigned char)x)) //if alphabet contains negative codes
 const int maxa = 53; //alphabet capacity
-const int maxn = 2e5; //verts count
-const int maxw = 2e5; //word count
+const int maxn = 2e5; //max verts count
+const int maxw = 2e5; //max word count
 struct node {
-	int end, suff, cSuff, next[maxa]; //end - id of one of word in vertex
-	//cSuff - compressed suf links (if we need poses of all occurences)
+	int end, suff, cSuff, next[maxa]; //end - id of one of word ends in vertex
+	//cSuff - compressed suf links (nearest suf which is terminal)
 } nodes[maxn];
 int cnt = 0, root = 0;
 vector<int> same_words[maxw]; //indexes of words equal to given (written as node[x].end)
-int word_lens[maxw];
+int word_lens[maxw]; //len of word with id
 
 int new_node() {
 	memset(nodes + cnt, -1, sizeof(node));
 	return cnt++;
 }
-void init() { cnt = 0; new_node(); } //MUST be called before use of trie
+void init() { cnt = 0; new_node(); } //MUST be called before begin use of trie
 void add_word(const char *st, int num) {
 	assert(cnt>0); word_lens[num] = strlen(st); int v; 
 	for (v = root; *st; ++st) {
@@ -43,7 +43,7 @@ void aho_corasik() { //(only suffix links) automaton construction
 	}	
 }
 int was[maxn], pres[maxw];//pres - if given word found
-void search(const char *st) {
+void search(const char *st) {//pres MUST be zeroed before call
 	memset(was, 0, sizeof(int) * cnt);
 	for (int v = root; *st; ++st) {
 		for ( ; nodes[v].next[numc(*st)] == -1; v = nodes[v].suff) ;
@@ -55,7 +55,7 @@ void search(const char *st) {
 					pres[same_words[nodes[v].end][i]] = 1;
 	}
 }
-int getShortSuff(int v) {//lazy eval of cSuff (for traverse occurences ends in each pos)
+int getShortSuff(int v) {//lazy eval of cSuff, may also calc some dp so
 	if (nodes[v].cSuff == -1) {
 		if (nodes[nodes[v].suff].end != -1) nodes[v].cSuff = nodes[v].suff;
 		else if (nodes[v].suff == root) nodes[v].cSuff = root; 
@@ -63,6 +63,7 @@ int getShortSuff(int v) {//lazy eval of cSuff (for traverse occurences ends in e
 	}
 	return nodes[v].cSuff;
 }
+//Traverse all occurences of given strings in string s
 int v = root;
 for (int j=0;j<Sz(s);j++) {
 	for ( ; nodes[v].next[numc(s[j])] == -1; v = nodes[v].suff);

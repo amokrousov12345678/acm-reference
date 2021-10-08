@@ -1,5 +1,5 @@
 // ************** Construction of suffix automata in O(n) **************
-const int maxn = 2e5; //states count
+const int maxn = 2e5; //max states count
 const int maxa = 53; //alphabet size
 char s[maxl]; //input string ('\0' terminated)
 
