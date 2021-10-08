@@ -230,10 +230,10 @@ bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, P
 }
 
 // ******************************* Gauss (NOT CHECKED)*********************
+//ALARM: n and m considered not in usual order!!! (TODO: swap and check)
 int n, m;//IN n - COLS, m - ROWS
 real_t matr[SIZE][SIZE];//IN/OUT matr[M][N]. Mth column may be B
-
-int r;//count of non-zero rows after diag (rank)
+int r;//OUT: count of non-zero rows after diag (rank)
 int adr[SIZE];//id of non-null column in row
 bool used[SIZE];//if column non-empty (i.e. var not free)
 //if calc det, remember where do swap or normalization row
