@@ -1,9 +1,8 @@
 // ************** Construction of suffix automata in O(n) **************
-const int maxn = 2e5; //max states count
+const int maxn = 2e5; //max states count (at least 2*maxl)
 const int maxa = 53; //alphabet size
 char s[maxl]; //input string ('\0' terminated)
 
-//TODO: add firstPos
 struct node { //vertex correspond to class of string with equal endpos sets
 	int next[maxa], suff, len, end;//end - if terminal, len - longest string in endpos equality class 
 	//suff - link to vertex of class of longest suffix which still isn't in same class as string
