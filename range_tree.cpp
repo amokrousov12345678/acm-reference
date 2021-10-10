@@ -1,6 +1,4 @@
 // **************************** Range trees ****************************
-const int inf = 0x3f3f3f3f;
-typedef int val_t;
 const int size = 1 << 17;//MUST BE power of 2
 struct rmq_t { // ********* RMQ without interval modification *********
 	val_t mas[size << 1];
@@ -131,3 +129,6 @@ struct segtree {
         return ans;
     }
 };
+//LiChao tree: store line in vert. On process vert: choose best (min/max) among newF and mas[v] in pnt m
+//Based on comparison in pnt l, in one half newF never could be optimal, descend to other
+//Leafs trivially updated. Answer to query: best in given point on path to leaf
