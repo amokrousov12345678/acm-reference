@@ -230,48 +230,46 @@ bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, P
 }
 
 // ******************************* Gauss (NOT CHECKED)*********************
-//ALARM: n and m considered not in usual order!!! (TODO: swap and check)
-int n, m;//IN n - COLS, m - ROWS
-real_t matr[SIZE][SIZE];//IN/OUT matr[M][N]. Mth column may be B
+int n, m;//IN n - rows, m - cols
+real_t matr[maxn][maxn];//IN/OUT matr[N][M]. For Ax=B equation put B in m+1 col, else put there 0s
 int r;//OUT: count of non-zero rows after diag (rank)
-int adr[SIZE];//id of non-null column in row
-bool used[SIZE];//if column non-empty (i.e. var not free)
+int adr[maxn];//id of non-null column in row
+bool used[maxn];//OUT: if column non-empty (i.e. var not free)
 //if calc det, remember where do swap or normalization row
 //if integer modulo, remove EPS, divide modulo. If modulo=2, use bit ops
 void Gauss() {//diagonalize matrix
 	int i, j, u;
 	r = 0; //first row of remaining part
 	memset(used, 0, sizeof(used));
-	for (i = 0; i <= n; ++i) {
+	for (i = 0; i <= m; ++i) {
 		int best = -1;
-		for (j = r; j < m; ++j) if (best < 0 || abs(matr[j][i]) > abs(matr[best][i])) best = j;
+		for (j = r; j < n; ++j) if (best < 0 || abs(matr[j][i]) > abs(matr[best][i])) best = j;
 		if (best < 0) break;//no rows left, stop
-		for (u = 0; u <= n; ++u) swap(matr[best][u], matr[r][u]);
+		for (u = 0; u <= m; ++u) swap(matr[best][u], matr[r][u]);
 		if (abs(matr[r][i]) < EPS) continue;//current column is zero, skip it
-		for (u = n; u >= i; --u) matr[r][u] /= matr[r][i]; //norm row
-		for (j = 0; j < m; ++j) if (j != r) {
-			real_t coef = matr[j][i];
-			for (u = i; u <= n; ++u) matr[j][u] -= coef * matr[r][u];
-		}//nullify all poses in column except of diagonal
+		for (u = m; u >= i; --u) matr[r][u] /= matr[r][i]; //norm row
+		for (j = 0; j < n; ++j) if (j != r) {
+				real_t coef = matr[j][i];
+				for (u = i; u <= m; ++u) matr[j][u] -= coef * matr[r][u];
+			}//nullify all poses in column except of diagonal
 		//may ignore upper/lower to get trigonal matrix little bit faster
 		used[i] = true;
 		adr[r++] = i;
 	}
 }
-real_t sol[SIZE];//var values which is one of solutions (if exists any)
+real_t sol[maxn];//var values which is one of solutions (if exists any)
 bool GetSolution() {//uses matr which should be upper trigonal
 	int i, j;
 	memset(sol, 0, sizeof(sol));
-	if (used[n]) return false;//incompatible system
-	sol[n] = -1.0;	//MUST BE SO!
-	for (i = 0; i < n; ++i)
+	if (used[m]) return false;//incompatible system
+	sol[m] = -1.0;    //MUST BE SO!
+	for (i = 0; i < m; ++i)
 		if (!used[i]) sol[i] = rand() / 32768.0; //free variables (any vals)
 	for (i = r - 1; i >= 0; --i)
 		for (j = adr[i] + 1; j <= n; ++j)
 			sol[adr[i]] -= sol[j] * matr[i][j];
 	return true;
 }
-
 // ******************************** LCA ********************************
 // LCA of two nodes: <a> and <b>, needs (N*logN)*sizeof(int) memory
 int n;//IN graph sz
