@@ -37,7 +37,7 @@ uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
 int main() {
 	cin.tie(0);
     cout.tie(0);
-    ios_base::sync_with_stdio(false);
+    ios_base::sync_with_stdio(false);//AHTUNG: esli zabudesh, TL ottarabanit
 	cout << setprecision(15) << fixed;
 	//((float)(clock() - t0)) / CLOCKS_PER_SEC
     return 0;
