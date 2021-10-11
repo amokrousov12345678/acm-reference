@@ -23,7 +23,12 @@ for (int i = 2; i < maxn; i++) {
     for (int j = 0; j < Sz(primes) && primes[j] <= lp[i] && i * primes[j] < maxn; ++j)
         lp[i * primes[j]] = primes[j];
 }
-
+//Calc mu(x) = (-1)^|primeDivisors| or 0 if contains prime^2. NEEDS lp FILLED BY SIEVE
+int mu[maxn];
+mu[1] = 1;
+for (int i=2;i<maxn;i++) {
+    ll pred = i/lp[i]; mu[i] = pred % lp[i] ? -mu[pred] : 0;
+}
 int get_log(int a, int b, int m) { // discrete log (x, s.t. a^x=b(mod m)
     int n = ((int) sqrt (m)) + 1;
     int an = 1; for (int i=0; i<n; ++i) an = mul(an, a, m);
