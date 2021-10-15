@@ -294,7 +294,46 @@ int LCA(int a, int b) {
 	if (a != b) a = par[0][a];
 	return a;
 }
-
+// ******************************* DSU **********************************
+int parent[maxn], sz[maxn];//parent link and component sz
+void make_set (int v) {//MUST be called for each v before usage
+    parent[v] = v; sz[v] = 1;
+}
+int find_set (int v) {//find_set(a)=find_set(b) if a and b in one set
+    if (v == parent[v]) return v;
+    return parent[v] = find_set (parent[v]);
+}
+void union_sets (int a, int b) {//join sets, which contain a and b
+    a = find_set (a); b = find_set (b);
+    if (a != b) {
+        if (sz[a] < sz[b]) swap (a, b);
+        parent[b] = a;
+        sz[a] += sz[b];
+    }
+}
+//CONVEX HULL TRICK: calculate min/max (ki*x+bi) on set lines (ki,bi) with convex hull idea
+//for min - MUST add in decreasing order by k, for max - increasing (draw to understand)
+template<bool rToL = false> //to add in reverse order, pass rToL = true
+struct CHT {
+    vector<line> lines;
+    vector<ll> ints; //ord numbers for lower bound
+    void add(const line& l) {
+        while (lines.size()>=2) {
+            double xl = inters(lines[Sz(lines)-2], lines[Sz(lines)-1]);
+            double xr = inters(lines[Sz(lines)-1], l);
+            if ((xl > xr && !rToL) || (xl < xr && rToL)) lines.pop_back(); else break;
+        }
+        ints.resize(lines.size()); ints.push_back(Sz(ints)); lines.push_back(l);
+    }
+    ll rq(ll x) {
+        assert(!lines.empty());
+        auto it = *lower_bound(ints.begin(), ints.end()-1, x,[this](ll id, ll x) {
+            if (!rToL) return inters(lines[id], lines[id+1]) < x;
+            else return inters(lines[id], lines[id+1]) > x;
+        });
+        return lines[it].f(x);
+    }
+};
 // **************************** maxflow:lift ****************************
 int n, s, t; 
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
@@ -389,26 +428,3 @@ flow_t dinic() {//returns flow amount
 	}
 	return flow;
 }
-//CONVEX HULL TRICK: calculate min/max (ki*x+bi) on set lines (ki,bi) with convex hull idea
-//for min - MUST add in decreasing order by k, for max - increasing (draw to understand)
-template<bool rToL = false> //to add in reverse order, pass rToL = true
-struct CHT {
-    vector<line> lines;
-    vector<ll> ints; //ord numbers for lower bound
-    void add(const line& l) {
-        while (lines.size()>=2) {
-            double xl = inters(lines[Sz(lines)-2], lines[Sz(lines)-1]);
-            double xr = inters(lines[Sz(lines)-1], l);
-            if ((xl > xr && !rToL) || (xl < xr && rToL)) lines.pop_back(); else break;
-        }
-        ints.resize(lines.size()); ints.push_back(Sz(ints)); lines.push_back(l);
-    }
-    ll rq(ll x) {
-        assert(!lines.empty());
-        auto it = *lower_bound(ints.begin(), ints.end()-1, x,[this](ll id, ll x) {
-            if (!rToL) return inters(lines[id], lines[id+1]) < x;
-            else return inters(lines[id], lines[id+1]) > x;
-        });
-        return lines[it].f(x);
-    }
-};

@@ -1,15 +1,16 @@
 // *************************** Global mincut ***************************
 // damages graph!, O(N^3)
 int n;//IN n -verts cnt
-cap_t g[maxn][maxn];//IN g[u][v] - weight (capacity) of (u,v)
-
+cap_t g[maxn][maxn];//IN g[u][v] - weight (capacity) of (u,v). 
+//CAUTION: g[u][v] = g[v][u]
 vector<int> best_cut;//OUT verts of one part (remaining are in other part)
 cap_t best_cost = INF;//OUT min sum weight of cutted edges between parts
 //auxillary arrays:
 vector<int> v[maxn];
 int w[maxn];
 bool exist[maxn], in_a[maxn];
-void mincut() {
+void minCut() {
+	best_cost = INFi; best_cut.clear(); 
 	for (int i = 0; i < n; ++i) v[i].assign(1, i);
 	memset(exist, true, sizeof(exist[0])*n);
 	for (int ph = 0; ph < n - 1; ++ph) {

@@ -26,6 +26,9 @@ typedef tree<int, __gnu_pbds::null_type, less<int>, __gnu_pbds::rb_tree_tag,
 		__gnu_pbds::tree_order_statistics_node_update>
         ordered_set; //find_by_order and order_of_key
 uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
+
+std::random_device rd; std::mt19937 rng{rd()}; std::mt19937 randMT(rng);//uniform int [a;b]
+int blessRng(int a, int b) { std::uniform_int_distribution<int> rang(a, b); return rang(randMT);}
 int main() {
 	cin.tie(0); cout.tie(0);
     ios_base::sync_with_stdio(false);//AHTUNG: esli zabudesh, TL ottarabanit
