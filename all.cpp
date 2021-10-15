@@ -388,6 +388,8 @@ int n, s, t;
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
 //IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 //O(V^2*E), O(E*sqrtV) on unit network (matching)
+flow_t minPushed = 1;//INTERNAL min flow we can push through edge now. MUST BE >0
+//(1 for int, eps for real, or changed automatically if dinicScale called)
 flow_t f[maxn][maxn]; //OUT (u,v) flow
 int d[maxn], ptr[maxn], q[maxn];
 bool bfs() {
@@ -397,7 +399,7 @@ bool bfs() {
 	d[s] = 0;
 	while (qh < qt) {
 		int v = q[qh++];
-		for (int to = 0; to < n; ++to) if (d[to] == -1 && f[v][to] < c[v][to]/*-eps*/) {
+		for (int to = 0; to < n; ++to) if (d[to] == -1 && f[v][to] + minPushed <= c[v][to]) {
 			q[qt++] = to;
 			d[to] = d[v] + 1;
 		}
@@ -405,12 +407,12 @@ bool bfs() {
 	return d[t] != -1;
 }
 flow_t dfs (int v, flow_t flow) {
-	if (!flow) return 0;//if (abs(flow)<eps) return 0;
+	if (flow < minPushed) return 0;
 	if (v == t) return flow;
 	for (int &to = ptr[v]; to < n; ++to) {
 		if (d[to] != d[v] + 1)  continue;
 		flow_t pushed = dfs(to, min(flow, c[v][to] - f[v][to]));
-		if (pushed) {//abs(pushed)>eps
+		if (pushed >= minPushed) {
 			f[v][to] += pushed;
 			f[to][v] -= pushed;
 			return pushed;
@@ -418,13 +420,20 @@ flow_t dfs (int v, flow_t flow) {
 	}
 	return 0;
 }
-flow_t dinic() {//returns flow amount
-	for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
+flow_t dinic(bool doClean = true) {//returns flow amount. doClean - should we reset f[i][j]
+	if (doClean) for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
 	flow_t flow = 0;
 	for (;;) {
 		if (!bfs()) break;
 		memset(ptr, 0, n * sizeof ptr[0]);
 		while (flow_t pushed = dfs (s, INF)) flow += pushed;
+	}
+	return flow;
+}
+flow_t dinicScale() {//returns flow amount, uses SCALING IDEA, modified minPushed
+	minPushed = INF; flow_t flow = 0;
+	while (minPushed) { /*minPushed > eps*/
+		flow += dinic(false); minPushed /= 2;
 	}
 	return flow;
 }
