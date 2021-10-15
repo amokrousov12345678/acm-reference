@@ -136,14 +136,15 @@ bool inPolygon(const Point &p, int n, const Point *arr, bool strict = false) {
 	for (int i = 0; i < n; ++i) if (CrossSegs(spot, p, arr[i], arr[i + 1])) cnt ^= 1;
 	return bool(cnt);
 }
-// Graham's convex hull (DOESN'T WORK)
+// Graham's convex hull
 // changes order of points! no equal points allowed! must have nonzero area
+//DONT forget to use EVERYWHERE double (in cmpHull, vp, Point class) when needed
 Point hctr;
 bool cmpHull(const Point &a, const Point &b) {
     Point ad = a - hctr;
     Point bd = b - hctr;
     int tv = vect(ad, bd);
-    if (tv) return tv > 0;
+    if (tv) return tv > 0; //abs(tv) > eps for real
     return ad.len2() < bd.len2();
 }
 //out k - size of convex hull in res, points CCW in res
@@ -296,14 +297,14 @@ int LCA(int a, int b) {
 }
 // ******************************* DSU **********************************
 int parent[maxn], sz[maxn];//parent link and component sz
-void make_set (int v) {//MUST be called for each v before usage
+void make_set(int v) {//MUST be called for each v before usage
     parent[v] = v; sz[v] = 1;
 }
-int find_set (int v) {//find_set(a)=find_set(b) if a and b in one set
+int find_set(int v) {//find_set(a)=find_set(b) if a and b in one set
     if (v == parent[v]) return v;
     return parent[v] = find_set (parent[v]);
 }
-void union_sets (int a, int b) {//join sets, which contain a and b
+void union_sets(int a, int b) {//join sets, which contain a and b
     a = find_set (a); b = find_set (b);
     if (a != b) {
         if (sz[a] < sz[b]) swap (a, b);
