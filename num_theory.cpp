@@ -78,7 +78,7 @@ bool solveDiofant(ll a, ll b, ll c, ll& x, ll& y, ll& dx, ll& dy) {
 }
 //system of equations x=rem[i] (mod mod[i]) with PAIRWISE COPRIME mod[i]
 //return R, s.t. X=R (mod (product mod[i] by i)) equivalent to system
-ll ch_rem(const vector<ll>& rem, const vector<ll>& mod) {//NOT CHECKED!
+ll chRem(const vector<ll>& rem, const vector<ll>& mod) {//NOT CHECKED!
     ll res = 0; assert(rem.size()==mod.size());
     ll M = 1;
     for (int i=0;i<Sz(mod);i++) M *= mod[i];

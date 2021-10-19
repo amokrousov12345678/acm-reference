@@ -14,7 +14,7 @@ void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
 # define E($...)
 #endif
 #define Sz(x) (int((x).size()))
-#define All(x) begin(x),end(x)
+#define assertTL(x) {if (!(x)) while(1);};
 using ll = long long;
 const int infI = 0x3f3f3f3f;
 const int infLL = 0x3f3f3f3f3f3f3f3f;
@@ -37,11 +37,14 @@ int main() {
     return 0;
 }
 //For tight ML: c++ io, vectors have very low impact (about 100kb). But compiler version/bitness 
-//is important factor
-//DFS may cause ML (big recursion). On rect grid use BFS
+//is important factor. DFS may cause ML (big recursion). On rect grid use BFS
 //euler formula: n - m + f = 2: m <= 3*n-6 - for planarity; n-verts, m - edges, f - faces (with outer)
 //simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x_(2n-1))+f(x_(2n)))*h/3 points [x0..x_(2n)] evenly
 //f(n) = sum(d|n) g(d) <=> g(n) = sum(d}n)(mu(d)*f(n/d)) (mobius inversion). n = sum(d|n)phi(d)
 //Kotlovan numbers: C(n) = sum(i=0;i<=n-1)(C(i)*C(n-1-i)) = 1/(n+1)*Binom(2n,n). 
 //Number of correct braces sequence len 2n
 //Newton method: x0, x_(i+1) = x_i - f(x_i)/f'(x_i). Need good start approx. Can used to calc sqrt
+//Stable matching: each vert has prefer list order, match to avoid conflict:
+//(A B) and (a b) matched, but A prefers b more than a, b prefers A more than B
+//Solution: free vert of left part tries best in his opinion not checked option. 
+//Second part accept rebind if new option better. Continue until all matched or pref lists exhausted.
