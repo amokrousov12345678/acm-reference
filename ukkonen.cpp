@@ -1,7 +1,7 @@
 // ************************* Ukkonen algorithm (suf tree) ********
 const int maxa = 53; //alphabet size
 char s[maxl]; //input string (MUST $ and '\0' terminated) 
-
+//usually in ST string written on EDGE. We write in VERTEX (except root) string for parent edge 
 struct node {
 	int k, p, suff;//vert corresponds to [k;p) substr. Suff link: xA -> A 
 	int next[maxa];//first letter of transition (by def different)
@@ -57,7 +57,7 @@ void make_tree() { // You MUST ensure to add '$' at the end of the string
 bool find_str(const char *st) {
 	for (int v = root, k = 0; *st; ++st) {
 		if (k >= tree[v].p) {
-			if (tree[v].next[numc(*st)] == -1) return false;
+			if (tree[v].next[numc(*st)] == -1)	 return false;
 			v = tree[v].next[numc(*st)];
 			k = tree[v].k;
 		}
