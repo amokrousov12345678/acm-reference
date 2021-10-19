@@ -6,7 +6,7 @@ char s[maxl]; //input string ('\0' terminated)
 struct node { //vertex correspond to class of string with equal endpos sets
 	int next[maxa], suff, len, end;//end - if terminal, len - longest string in endpos equality class 
 	//suff - link to vertex of class of longest suffix which still isn't in same class as string
-	//to find all occurences of string, do dfs on reverse suf links tree (+don't print clones, but traverse them)
+	//to find all occurences of string, do dfs on reverse suf links tree (+DON'T PRINT clones, but TRAVERSE them)
 	int firstPos;//first endpos of vertex
 } nodes[maxn];
 int root, cnt;
