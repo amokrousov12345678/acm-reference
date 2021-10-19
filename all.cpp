@@ -229,8 +229,49 @@ bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, P
 	}
 	return CrossLineCircle(a, b, c1, r1, res1, res2);
 }
-
-// ******************************* Gauss (NOT CHECKED)*********************
+//*******************************************HASHES******************************
+namespace HPar {//when change SZ MUST copypaste logic for other base(s) EVERYWHERE
+    const int SZ = 1;//Primitives: (3 by 998244353, 5(125) by 1e9+7, 13 by 1e9+9)
+    int mods[SZ], base[SZ], invBase[SZ], basePows[SZ][maxn], invBasePows[SZ][maxn];
+    void init() {
+        mods[0] = 998244353; base[0] = 27; invBase[0] = inv(base[0], mods[0]);
+        basePows[0][0] = 1; invBasePows[0][0] = 1;
+        for (int i=1;i<maxn;i++) {
+            basePows[0][i] = mul(basePows[0][i-1], base[0], mods[0]);
+            invBasePows[0][i] = mul(invBasePows[0][i-1], invBase[0], mods[0]);
+        }
+    }
+}
+struct H {
+    std::array<int, HPar::SZ> data{0};
+    void append(int pos, char ch) {//pos - RELATIVE in hash, coef
+        data[0] = add(data[0], mul(HPar::basePows[0][pos], numc(ch), HPar::mods[0]), HPar::mods[0]);
+    }
+    void erase0th(char ch) {//ch - CH on this pos
+        data[0] = sub(data[0], numc(ch), HPar::mods[0]);
+        data[0] = mul(data[0], HPar::invBase[0], HPar::mods[0]);
+    }
+    friend H operator-(const H& l, const H& r) {
+        H res; res.data[0] = sub(l.data[0], r.data[0], HPar::mods[0]); return res;
+    }
+    void shiftLeft(int cnt) {//indexing [l;r] -> [l-cnt;r-cnt] (if [l-cnt;l) initially empty!!)
+        data[0] = mul(data[0], HPar::invBasePows[0][cnt], HPar::mods[0]);
+    }
+    friend bool operator==(const H& l, const H& r) {return l.data==r.data;}
+};
+namespace std { template<> struct hash<H> {
+        std::size_t operator()(H const& h) const noexcept {return h.data[0]/* ^ h.data[1]*/;}
+};};
+vector<H> getPrefHashes(const string& s) {//res[i] - hash of pref [0..i]
+    vector<H> res; H acc;
+    for (int i=0;i<Sz(s);i++) {acc.append(i, s[i]); res.push_back(acc);} return res;
+}
+H getSubstrHash(const vector<H>& prefHashes, int l, int r) {//get [l;r] hash
+    assert(l<=r && r<Sz(prefHashes));
+    H res = prefHashes[r]; if (l) res = res-prefHashes[l-1];
+    res.shiftLeft(l); return res;
+}
+// ******************************* Gauss *********************
 int n, m;//IN n - rows, m - cols
 real_t matr[maxn][maxn];//IN/OUT matr[N][M]. For Ax=B equation put B in m+1 col, else put there 0s
 int r;//OUT: count of non-zero rows after diag (rank)
@@ -310,6 +351,15 @@ void union_sets(int a, int b) {//join sets, which contain a and b
         if (sz[a] < sz[b]) swap (a, b);
         parent[b] = a;
         sz[a] += sz[b];
+    }
+}
+//given arr[0..2^bits-1]. Calc res[i] = sum(j submask of i)arr[j]. Stored in same arr. 
+//May be used ^=, &=, |= instead of +- (any commutative associative ops)
+void sumOnSubsets(T* arr, int bits) {
+    int sz = 1<<bits;
+    for (int j=bits-1;j>=0;j--) {
+        int shift = 1<<(j+1); int len = 1<<j;
+        for (int i=0;i<sz;i+=shift) for (int k=i;k<i+len;k++) arr[k+len] += arr[k];
     }
 }
 //CONVEX HULL TRICK: calculate min/max (ki*x+bi) on set lines (ki,bi) with convex hull idea
