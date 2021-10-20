@@ -247,7 +247,7 @@ struct H {
     void append(int pos, char ch) {//pos - RELATIVE in hash, coef
         data[0] = add(data[0], mul(HPar::basePows[0][pos], numc(ch), HPar::mods[0]), HPar::mods[0]);
     }
-    void erase0th(char ch) {//ch - CH on this pos
+    void erase0th(char ch) {//ch - CH on this pos, all other "chars" shift left
         data[0] = sub(data[0], numc(ch), HPar::mods[0]);
         data[0] = mul(data[0], HPar::invBase[0], HPar::mods[0]);
     }
@@ -270,6 +270,14 @@ H getSubstrHash(const vector<H>& prefHashes, int l, int r) {//get [l;r] hash
     assert(l<=r && r<Sz(prefHashes));
     H res = prefHashes[r]; if (l) res = res-prefHashes[l-1];
     res.shiftLeft(l); return res;
+}
+//*****************************Euler tour*******************
+vector<int> path;//MUST clear before use. Exists if number of odd verts 0 (or 2, then patch by edge)
+void dfs(int v) {//MUST reverse printed cycle when orinted edges
+    while (!g[v].empty()) {
+        int to = *g[v].begin(); g[v].erase(to);/*g[to].erase(v);*/dfs(to);
+    }
+    path.push_back(v);
 }
 // ******************************* Gauss *********************
 int n, m;//IN n - rows, m - cols
