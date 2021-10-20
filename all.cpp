@@ -275,7 +275,7 @@ H getSubstrHash(const vector<H>& prefHashes, int l, int r) {//get [l;r] hash
 vector<int> path;//MUST clear before use. Exists if number of odd verts 0 (or 2, then patch by edge)
 void dfs(int v) {//MUST reverse printed cycle when orinted edges
     while (!g[v].empty()) {
-        int to = *g[v].begin(); g[v].erase(to);/*g[to].erase(v);*/dfs(to);
+        int to = *g[v].begin(); g[v].erase(to);/*g[to].erase(v); (for bidir edges)*/dfs(to);
     }
     path.push_back(v);
 }
