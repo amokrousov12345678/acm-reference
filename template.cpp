@@ -17,7 +17,7 @@ void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
 #define assertTL(x) {if (!(x)) while(1);};
 using ll = long long;
 const int infI = 0x3f3f3f3f;
-const int infLL = 0x3f3f3f3f3f3f3f3f;
+const ll infLL = 0x3f3f3f3f3f3f3f3f;
 
 #include <ext/pb_ds/assoc_container.hpp> // Main file
 #include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
@@ -49,3 +49,5 @@ int main() {
 //(A B) and (a b) matched, but A prefers b more than a, b prefers A more than B
 //Solution: free vert of left part tries best in his opinion not checked option. 
 //Second part accept rebind if new option better. Continue until all matched or pref lists exhausted.
+System.setIn(new FileInputStream("input.txt"));//LONG ARITHM, BigInteger immutable)
+Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));

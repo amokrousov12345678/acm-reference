@@ -83,7 +83,7 @@ struct segtree {
     pval_t def[4*size]; const static pval_t neutralUpdate = 0;
     val_t applyUpdate(val_t val, val_t push) {};//apply update to  vertex
     val_t rqOp(val_t lhs, val_t rhs) {}//op for range query
-    val_t combineUpdates(val_t cur, val_t fromUp) {return cur+fromUp;};//apply def[par] into def[v]
+    pval_t combineUpdates(pval_t cur, pval_t fromUp) {return cur+fromUp;};//apply def[par] into def[v]
 
     void build(int* vals, int n, int v = 1, int l = 0, int r = size-1) {
         if (l==r) {mas[v] = l<n ? vals[l] : neutral; def[v] = neutralUpdate; return;}
@@ -96,7 +96,7 @@ struct segtree {
         def[2*v] = combineUpdates(def[2*v], def[v]);
         def[2*v+1] = combineUpdates(def[2*v+1], def[v]); def[v] = neutralUpdate;
     }
-    void update(int rq_l, int rq_r, val_t val, int v = 1, int l = 0, int r = size-1) {
+    void update(int rq_l, int rq_r, pval_t val, int v = 1, int l = 0, int r = size-1) {
         if (l > rq_r || r < rq_l) return;
         if (rq_l <= l && r <= rq_r) {def[v] = combineUpdates(def[v], val); return;}
         push(v); int m = (l+r)/2;
