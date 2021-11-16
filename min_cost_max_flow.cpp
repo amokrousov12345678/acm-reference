@@ -1,15 +1,10 @@
 // ************************* Min-cost max-flow *************************
-const int inf = 0x3f3f3f3f;
-const int maxn = 1 << 7;
-const int maxe = maxn * maxn;
-typedef int dist_t;
-
 struct edge {
-	int dest, back, f, c;
-	dist_t w;
+	int dest, back;//dest - vert to, back - id of reverse edge (actually id^1), 
+	flow_t f, c; dist_t w;//OUT f - edge flow, IN c - capacity, w - edge cost
 } edges[maxe];
-int cnt, n;
-vector<int> g[maxn];
+int cnt, n;//IN cnt - cnt edges. Set to 0 before use on other graph, IN n - cnt verts
+vector<int> g[maxn];//IN: g[v] - IDS of edges go from v
 
 void add_edge(int u, int v, int c, dist_t w) {
 	edges[cnt].dest = v;
@@ -26,9 +21,9 @@ void add_edge(int u, int v, int c, dist_t w) {
 	g[v].push_back(cnt + 1);
 	cnt += 2;
 }
-int was[maxn], prev[maxn], r[maxn];
-dist_t dist[maxn], phi[maxn];
-
+int was[maxn], prevE[maxn];//was[v] - if v visited, prevE[v] - id of backedge to v
+flow_t r[maxn]; dist_t dist[maxn], phi[maxn];//r[v] - min cap of path to v
+//dist - sum cost on path, phi - johnson potential
 bool dijk(int s, int t) {
 	int i, j;
 	for (i = 0; i < n; ++i) dist[i] = inf;
@@ -46,35 +41,27 @@ bool dijk(int s, int t) {
 			if (!was[e.dest] && e.f < e.c && dist[e.dest] > dist[mv] + e.w + phi[mv] - phi[e.dest]) {
 				dist[e.dest] = dist[mv] + e.w + phi[mv] - phi[e.dest];
 				r[e.dest] = min(r[mv], e.c - e.f);
-				prev[e.dest] = e.back;
+				prevE[e.dest] = e.back;
 			}
 		}
 	}
-	return r[t] > 0;
+	return r[t] > 0;/*r[t] >= eps*/
 }
-
 dist_t aug(int s, int t) {
-	int rr = r[t];
+	flow_t rr = r[t];
 	dist_t ans = 0;
 	while (s != t) {
-		edge &e = edges[prev[t]];
-		ans -= e.w * rr;
-		e.f -= rr;
-		edges[e.back].f += rr;
-		t = e.dest;
+		edge &e = edges[prevE[t]]; ans -= e.w * rr; e.f -= rr; edges[e.back].f += rr; t = e.dest;
 	}
 	return ans;
 }
-int flow;
-dist_t cost;
 
+flow_t flow; dist_t cost;//OUT flow - max flow, cost - sum cost
 void min_cost_max_flow(int s, int t) {
-	int i;
-	for (i = 0; i < n; ++i) phi[i] = 0;
+	int i; for (i = 0; i < n; ++i) phi[i] = 0;
+	for (i = 0; i < cnt; ++i) edges[i].f = 0;
 	cost = flow = 0;
 	while (dijk(s, t)) {
-		flow += r[t];
-		cost += aug(s, t);
-		for (i = 0; i < n; ++i) phi[i] += dist[i];
+		flow += r[t]; cost += aug(s, t); for (i = 0; i < n; ++i) phi[i] += dist[i];
 	}
 }

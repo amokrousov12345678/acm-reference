@@ -394,9 +394,9 @@ struct CHT {
     }
 };
 // **************************** maxflow:lift ****************************
+//IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 int n, s, t; 
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
-//IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 //O(V^2*sqrt(E)), in practice often slower than Dinitz on arbitrary graph
 flow_t f[maxn][maxn]; //OUT f[u][v] - (u,v) flow
 flow_t e[maxn]; int h[maxn], maxh[maxn];
@@ -443,9 +443,9 @@ flow_t pushRelabel() {//returns flow amount
 	return flow;
 }
 // *************************** maxflow:Dinits ***************************
+//IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 int n, s, t; 
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
-//IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 //O(V^2*E), O(E*sqrtV) on unit network (matching)
 flow_t minPushed = 1;//INTERNAL min flow we can push through edge now. MUST BE >0
 //(1 for int, eps for real, or changed automatically if dinicScale called)
@@ -489,7 +489,7 @@ flow_t dinic(bool doClean = true) {//returns flow amount. doClean - should we re
 	}
 	return flow;
 }
-flow_t dinicScale() {//returns flow amount, uses SCALING IDEA, modified minPushed
+flow_t dinicScale() {//returns flow amount, uses SCALING IDEA, modifies minPushed
 	minPushed = INF; flow_t flow = 0;
 	while (minPushed) { /*minPushed > eps*/
 		flow += dinic(false); minPushed /= 2;

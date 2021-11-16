@@ -81,7 +81,7 @@ struct fenvic_t { //for multiple dimensions loops by each index
 struct segtree {
     val_t mas[4*size]; const static val_t neutral = 0;
     pval_t def[4*size]; const static pval_t neutralUpdate = 0;
-    val_t applyUpdate(val_t val, val_t push) {};//apply update to  vertex
+    val_t applyUpdate(val_t val, pval_t push) {};//apply update to  vertex
     val_t rqOp(val_t lhs, val_t rhs) {}//op for range query
     pval_t combineUpdates(pval_t cur, pval_t fromUp) {return cur+fromUp;};//apply def[par] into def[v]
 
@@ -140,4 +140,4 @@ struct segtree {//persistent (WIHTOUT group ops, for them adopt upper version (T
         val_t res = rqOp(query(rq_l, rq_r, v->l, l, m), query(rq_l, rq_r, v->r, m+1, r));
         return res;
     }
-};
+};//for lazy on big range create children for vertex on demand
