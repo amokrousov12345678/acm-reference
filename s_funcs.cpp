@@ -1,6 +1,7 @@
 // ************************* String functions **************************
 inline int numc(char c) { return c <= 'Z' ? c - 'A' : c - 'a' + 26; }
 void prefix_function(const char *s, int *pi) {
+    //p[i] = max len of non-trivial prefix equal to suffix of S[0..i-1]
 	int n = strlen(s);
 	for (int i = 1; i < n; ++i) {
 		int j = pi[i - 1];
@@ -9,7 +10,7 @@ void prefix_function(const char *s, int *pi) {
 		pi[i] = j;
 	}
 }
-void z_function(const char *st, int *z) {
+void z_function(const char *st, int *z) {//Z[i] = max common prefix of S[0..n-1] and S[i..n-1]
 	int i, j = 0, r = 0, l;
 	z[0] = l = strlen(st);
     z[l] = '#';
@@ -42,8 +43,8 @@ string min_cyclic_shift(string s) {
 	}
 	return s.substr(ans, n / 2);
 }
-// Palindromes (NOT CHECKED)
-int l = 0, r = -1;
+// Palindromes O(N): d1[i] - count of odd palindromes with center i, 
+int l = 0, r = -1; //d2[i] - even palindromes with "right" center i
 for (int i = 0; i < n; ++i) {
 	int k = (i > r ? 1 : min(d1[l + r - i], r - i));
 	while (i + k < n && i - k >= 0 && s[i + k] == s[i - k]) ++k;
