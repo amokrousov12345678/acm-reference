@@ -49,5 +49,6 @@ int main() {
 //(A B) and (a b) matched, but A prefers b more than a, b prefers A more than B
 //Solution: free vert of left part tries best in his opinion not checked option. 
 //Second part accept rebind if new option better. Continue until all matched or pref lists exhausted.
+//Pik formula: S = I+B/2 -1. S-area, I-count int points inside, B-count int points of bound. S must be >0
 System.setIn(new FileInputStream("input.txt"));//LONG ARITHM, BigInteger immutable)
 Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));

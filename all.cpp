@@ -287,6 +287,7 @@ int adr[maxn];//id of non-null column in row
 bool used[maxn];//OUT: if column non-empty (i.e. var not free)
 //if calc det, remember where do swap or normalization row
 //if integer modulo, remove EPS, divide modulo. If modulo=2, use bit ops
+//to invert write in matr 2n*n (A|E), and diag. Result will be (E|A^(-1))
 void Gauss() {//diagonalize matrix
 	int i, j, u;
 	r = 0; //first row of remaining part
