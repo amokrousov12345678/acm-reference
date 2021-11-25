@@ -231,7 +231,7 @@ bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, P
 }
 //*******************************************HASHES******************************
 namespace HPar {//when change SZ MUST copypaste logic for other base(s) EVERYWHERE
-    const int SZ = 1;//Primitives: (3 by 998244353, 5(125) by 1e9+7, 13 by 1e9+9)
+    const int SZ = 1;//Primitives: (3(27)(243) by 998244353, 5(125) by 1e9+7, 13 by 1e9+9)
     int mods[SZ], base[SZ], invBase[SZ], basePows[SZ][maxn], invBasePows[SZ][maxn];
     void init() {
         mods[0] = 998244353; base[0] = 27; invBase[0] = inv(base[0], mods[0]);

@@ -1,7 +1,7 @@
 // ************************* String functions **************************
 inline int numc(char c) { return c <= 'Z' ? c - 'A' : c - 'a' + 26; }
 void prefix_function(const char *s, int *pi) {
-    //p[i] = max len of non-trivial prefix equal to suffix of S[0..i-1]
+    //p[i] = max len of non-trivial (len!=i+1) prefix = suffix of S[0..i] (or 0 if such not exist)
 	int n = strlen(s);
 	for (int i = 1; i < n; ++i) {
 		int j = pi[i - 1];
