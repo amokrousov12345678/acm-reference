@@ -21,7 +21,7 @@ void recalc(Node* root) {
     root->fVal = rqOp(getF(root->left), rqOp(root->val, getF(root->right)));
 }
 void push(Node* root) {
-    //push delayed modifications to children (if exists) + maybe swap them
+    //push delayed modifications to children (if exists) + maybe swap them (example: tree with range rev)
     if (root->left) root->left->def = combineUpdates(root->left->def, root->def);
     if (root->right) root->right->def = combineUpdates(root->right->def, root->def);
     root->def = neutralPush;
