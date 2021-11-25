@@ -1,180 +1,75 @@
-// ******************* Cartesian tree implementation *******************
-typedef int fkey_t;//data key
-typedef int skey_t;
-//calculate f without pushes (or make them work)
-
-struct node {
-    fkey_t pk;
-    skey_t sk;
-    int sz;
-    node *left, *right;
-    int val, min_val, max_val;
-    int64 sum_val;
-    int sum, rev;
-    void recalc();
-    int size() {
-        return this == NULL ? 0 : sz;
+//DONT FORGET to merge after split
+//Group ops are usable only for implicit treap, primary key - for not implicit.
+//Simple made persistent by creating new verts instead of modifying existing
+typedef int pkey_t; typedef int val_t;//pkey_t = key type, val_t = data key
+typedef int rng_t; typedef int pval_t; //rng_t = rand key, pval_t = push value
+const static val_t neutral = 0; const static pval_t neutralPush = 0;
+struct Node {
+    rng_t sk; int sz; //sk - rand key, sz - subtree sz
+    Node *left, *right; //left,right - pointers to childs or null
+    val_t val, fVal;//val - value in vert, fVal - f on subtree
+    pval_t def; pkey_t pk; //def - deferred change, pk - search tree key
+    Node(pkey_t key, val_t val) {
+        pk = key; this->val = fVal = val; sk = rand(); sz = 1; left = right = nullptr; def = neutralPush;
     }
 };
-
-void node::recalc() {
-    sz = 1 + left->size() + right->size();
-    sum_val = min_val = max_val = (val += sum);
-    if (left != NULL) {
-        left->sum += sum;
-        left->rev ^= rev;
-        min_val = min(min_val, left->min_val + left->sum);
-        max_val = max(max_val, left->max_val + left->sum);
-        sum_val += left->sum_val + int64(left->sum) * left->size();
-    }
-    if (right != NULL) {
-        right->sum += sum;
-        right->rev ^= rev;
-        min_val = min(min_val, right->min_val + right->sum);
-        max_val = max(max_val, right->max_val + right->sum);
-        sum_val += right->sum_val + int64(right->sum) * right->size();
-    }
-    if (rev) swap(left, right);
-    sum = rev = 0;
+int size(Node* root) {return root ? root->sz : 0;}
+val_t getF(Node* root) {return root ? root->fVal : neutral;};
+val_t rqOp(val_t lhs, val_t rhs) {return lhs+rhs;}//OPERATION FOR QUERIES IN TREAP
+void recalc(Node* root) {
+    root->sz = 1 + size(root->left) + size(root->right);
+    root->fVal = rqOp(getF(root->left), rqOp(root->val, getF(root->right)));
 }
-node *root = NULL;
-
-node* new_node(const fkey_t &pk, const skey_t &sk) {
-    node* ptr = new node();
-    ptr->pk = pk; ptr->sk = sk;
-    ptr->left = ptr->right = NULL;
-    ptr->sz = 1;
-    ptr->sum_val = ptr->val = ptr->max_val = ptr->min_val = 0;
-    ptr->sum = ptr->rev = 0;
-    return ptr;
+void push(Node* root) {
+    //push delayed modifications to children (if exists) + maybe swap them
+    if (root->left) root->left->def = combineUpdates(root->left->def, root->def);
+    if (root->right) root->right->def = combineUpdates(root->right->def, root->def);
+    root->def = neutralPush;
 }
-
-void split(node *v, const fkey_t &pk, node *&left, node *&right) {
-    if (v == NULL) {
-        left = right = NULL;
-        return;
-    }
-    v->recalc();
-    if (v->pk <= pk) {
-        split(v->right, pk, v->right, right);
-        left = v;	
+//split by pk "<" to the left, ">="(not "<") to the right
+pair<Node*, Node*> split(Node* root, pkey_t key) {
+    if (!root) return {nullptr, nullptr};
+    push(root); auto rootVal = root->pk;
+    if (rootVal < key) {//criteria
+        auto p = split(root->right, key); root->right = p.first;
+        recalc(root); return {root, p.second};
     } else {
-        split(v->left, pk, left, v->left);
-        right = v;
+        auto p = split(root->left, key); root->left = p.second;
+        recalc(root); return {p.first, root};
     }
-    v->recalc();
 }
-
-// Not intended to be used with delayed operations.
-// Probably you just need to add v->recalc().
-node* add(node *&v, const fkey_t &pk, const skey_t &sk) { 
-    if (v == NULL || v->sk >= sk) {                        
-        node* cur = new_node(pk, sk);
-        split(v, pk, cur->left, cur->right);
-        cur->recalc();
-        return v = cur;
-    }
-    node* ptr = (pk <= v->pk) ? add(v->left, pk, sk) : add(v->right, pk, sk);
-    v->recalc();
-    return ptr;
-}
-
-// You MUST manually call left->recalc() and right->recalc()
-// while calling this function !!!
-node* merge(node *left, node *right) { 
-    if (left == NULL) return right;     
-    if (right == NULL) return left;
-    if (left->sk <= right->sk) {
-        if (left->right != NULL) left->right->recalc();
-        left->right = merge(left->right, right);
-        left->recalc();
-        return left;
+pair<Node*, Node*> splitKLeft(Node* root, int k) {//cut k items from left (most usable in implicit treap)
+    if (!root) return {nullptr, nullptr};
+    push(root); auto leftSz = size(root->left);
+    if (leftSz < k) {
+        auto p = splitKLeft(root->right, k-leftSz-1); root->right = p.first;
+        recalc(root); return {root, p.second};
     } else {
-        if (right->left != NULL) right->left->recalc();
-        right->left = merge(left, right->left);
-        right->recalc();
-        return right;
+        auto p = splitKLeft(root->left, k); root->left = p.second;
+        recalc(root); return {p.first, root};
     }
 }
-
-void erase(node *&v, const fkey_t &pk) {
-    if (v == NULL) return;
-    v->recalc();
-    if (v->pk == pk) {
-        node* tmp = merge(v->left, v->right);
-        delete v;
-        v = tmp;
-        return;
-    }
-    if (pk <= v->pk) {
-        erase(v->left, pk);
-        v->recalc();
+Node* findByKey(Node* root, pkey_t key) {
+    if (root==nullptr) return nullptr; push(root); if (root->pk==key) return root;
+    return key < root->pk ? findByKey(root->left, key) : findByKey(root->right, key);
+}
+Node* findByPos(Node* root, int pos) {
+    if (root==nullptr) return nullptr; int leftSz = size(root->left); push(root); if (pos==leftSz) return root;
+    return pos < leftSz ? findByPos(root->left, pos) : findByPos(root->right, pos-leftSz-1);
+}
+//usable both in implicit and normal treap (for normal all left keys < all right keys)
+Node* merge(Node* root1, Node* root2) {
+    if (!root1) return root2; if (!root2) return root1;
+    push(root1); push(root2);
+    if (root1->sk>root2->sk) {
+        root1->right = merge(root1->right, root2); recalc(root1); return root1;
     } else {
-        erase(v->right, pk);
-        v->recalc();
-    }
+        root2->left = merge(root1, root2->left); recalc(root2); return root2;
+    }//for persist, if sz1=L, sz2=R, choose root 1 with prob L/(L+R). Otherwise O(N) contertest
 }
-
-node* search(node *v, const fkey_t &pk) {
-    if (v == NULL) return NULL;
-    v->recalc();
-    if (v->pk == pk) return v;
-    return (pk <= v->pk) ? search(v->left, pk) : search(v->right, pk);
+Node* insert(Node* root, Node* node) {//DOESNT WORK FOR IMPLICIT TREAP
+    auto split1 = split(root, node->pk); return merge(split1.first, merge(node, split1.second));
 }
-
-void clear(node *&v) {
-    if (v == NULL) return;
-    clear(v->left);
-    clear(v->right);
-    delete v;
-    v = NULL;
-}
-
-node* begin() {
-    if (root == NULL) return NULL;
-    node* v = root;
-    for (v->recalc(); v->left != NULL; v->recalc()) v = v->left;
-    return v;
-}
-
-int count_less(const fkey_t &pk) {
-    int ans = 0;
-    for (node* v = root; v != NULL;) {
-        v->recalc();
-        if (pk <= v->pk) v = v->left;
-        else {
-            ans += v->left->size() + 1;
-            v = v->right;
-        }
-    }
-    return ans;
-}
-
-node* get_kth(int k) { //zero based
-    for (node* v = root; v != NULL ;) {
-        v->recalc();
-        if (v->left->size() == k) return v;
-        else if (v->left->size() > k) v = v->left;
-        else {
-            k -= v->left->size() + 1;
-            v = v->right;
-        }
-    }
-    return NULL;
-}
-
-void cut_k(node *v, int k, node *&left, node *&right) { // cut k nodes from left
-    if (v == NULL) {
-        left = right = NULL;
-        return;
-    }
-    v->recalc();
-    if (v->left->size() >= k) {
-        right = v;
-        cut_k(v->left, k, left, right->left);
-    } else {
-        left = v;
-        cut_k(v->right, k - (v->left->size() + 1), left->right, right);
-    }
-    v->recalc();
-}
+Node* getLeftMost(Node* root) {if (root->left) return getLeftMost(root->left); else return root;}
+//to erase: cur less + cut equal, merge less and more
+//to apply group op: cut tree with segment and put change to root
