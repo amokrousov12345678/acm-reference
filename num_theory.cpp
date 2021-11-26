@@ -45,7 +45,7 @@ int getLog(int a, int b, int m) {
         }
         cur = mul(cur,a,m);
     }
-    assert(0);/*uncomment assert if you EXPECT that log can't not exist*/ return -1;
+    assert(0);/*comment assert if you EXPECT that log may not exist*/ return -1;
 }
 //g - generator of group numbers coprime with m. For prime m group is mult group Zm/{0}
 //g - generator <=> for each d which is prime divisor of phi(m): g^(phi(m)/d) != 1
