@@ -2,7 +2,7 @@
 //set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fsanitize=address -fsanitize=undefined")
 //#pragma GCC optimize("Ofast,no-stack-protector,unroll-loops,fast-math")
 //#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,avx2,fma")//drop avx and fma if RE#1
-//(on Yandex, on NSUts remove also avx)
+//(on Yandex. On NSUts remove also avx)
 ////#pragma GCC optimize("O3,no-stack-protector,unroll-loops") FOR GEOM INSTEAD OF 1st
 ////#pragma comment(linker, ”/STACK:36777216“) (for Studio if get ML on GCC)
 using namespace std;
@@ -17,6 +17,10 @@ void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
 using ll = long long;
 const int infI = 0x3f3f3f3f;
 const ll infLL = 0x3f3f3f3f3f3f3f3f;
+
+struct hash_pair { //to allow unordered_map<pair<int, int>, bool, hash_pair>
+	template <class T1, class T2> size_t operator()(const pair<T1, T2>& p) const {
+		auto hash1 = hash<T1>{}(p.first); auto hash2 = hash<T2>{}(p.second); return hash1 ^ hash2;}};
 
 #include <ext/pb_ds/assoc_container.hpp> // Main file
 #include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
