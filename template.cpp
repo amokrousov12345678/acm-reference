@@ -1,11 +1,10 @@
 #include <bits/stdc++.h>
 //set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fsanitize=address -fsanitize=undefined")
-#pragma optimization_level 3
-#pragma GCC optimize("Ofast,no-stack-protector,unroll-loops,fast-math,O3")
-#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx")
-#pragma GCC optimize("Ofast")//Comment optimisations for interactive problems (use endl)
-#pragma GCC target("avx,avx2,fma")
-#pragma GCC optimization ("unroll-loops")
+//#pragma GCC optimize("Ofast,no-stack-protector,unroll-loops,fast-math")
+//#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,avx2,fma")//drop avx and fma if RE#1
+//(on Yandex, on NSUts remove also avx)
+////#pragma GCC optimize("O3,no-stack-protector,unroll-loops") FOR GEOM INSTEAD OF 1st
+////#pragma comment(linker, ”/STACK:36777216“) (for Studio if get ML on GCC)
 using namespace std;
 #ifdef ILIKEGENTOO
 void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
@@ -50,5 +49,6 @@ int main() {
 //Solution: free vert of left part tries best in his opinion not checked option. 
 //Second part accept rebind if new option better. Continue until all matched or pref lists exhausted.
 //Pik formula: S = I+B/2 -1. S-area, I-count int points inside, B-count int points of bound. S must be >0
+//std::string_stream is cool thing to tokenize string)
 System.setIn(new FileInputStream("input.txt"));//LONG ARITHM, BigInteger immutable)
 Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
