@@ -28,102 +28,84 @@ for (int s = m; ;s = (s - 1) & m) {
 }
 
 //***************************** Geometry *******************
-struct Point { //integer point
-	int x, y;
-	inline Point() : x(0), y(0) {}
-	inline Point(int _x, int _y) : x(_x), y(_y) {}
-	inline int len2() const { return x * x + y * y; }
-    inline int operator!() const { return x*x + y*y; }
-	inline const Point operator + (const Point &b) const {
-		return Point(x + b.x, y + b.y);
-	}
-	inline const Point operator - (const Point &b) const {
-		return Point(x - b.x, y - b.y);
-	}
-	inline const Point operator * (int b) const {
-		return Point(x * b, y * b);
-	}
-	inline bool operator == (const Point &b) const {
-		return x == b.x && y == b.y;
-	}
-	inline bool half() const { //true if in lower halfspace
-		return (y < 0 || (y == 0 && x < 0));
-	}
-	inline bool operator < (const Point &b) const;
+template<typename T>
+struct PointT { //integer point
+    T x, y;
+    inline PointT() : x(0), y(0) {}
+    inline PointT(T _x, T _y) : x(_x), y(_y) {}
+    inline T len2() const { return x * x + y * y; }
+    inline double len() const { return sqrt(len2()); }
+    inline const PointT operator + (const PointT &b) const {
+        return PointT(x + b.x, y + b.y);
+    }
+    inline const PointT operator - (const PointT &b) const {
+        return PointT(x - b.x, y - b.y);
+    }
+    inline const PointT operator * (T b) const {
+        return PointT(x * b, y * b);
+    }
+    inline bool operator == (const PointT &b) const {
+        return x == b.x && y == b.y;
+    }
+    inline bool half() const { //true if in lower halfspace
+        return (y < 0 || (y == 0 && x < 0));
+    }
+    inline bool operator < (const PointT &b) const { 
+        bool th = half() ? 1 : 0;
+        bool bh = b.half() ? 1 : 0;
+        if (th ^ bh) return th < bh;
+        auto pv = vect(*this, b);
+        return pv > 0;
+    }//integer compare by polar angle (counted from OX CCW)
+
+    inline friend auto vect(const PointT &a, const PointT &b) {
+        return a.x * b.y - a.y * b.x;
+    }
+    inline friend auto scal(const PointT &a, const PointT &b) {
+        return a.x * b.x + a.y * b.y;
+    }   
 };
-inline int vect(const Point &a, const Point &b) {
-	return a.x * b.y - a.y * b.x;
-}
-inline int scal(const Point &a, const Point &b) {
-	return a.x * b.x + a.y * b.y;
-}
-// comparing by polar angle, <*this> and <b> MUST BE NONZERO
-inline bool Point::operator < (const Point &b) const {
-	int th = half();
-	int bh = b.half();
-	if (th ^ bh) return th < bh;
-	int pv = vect(*this, b);
-	return pv > 0;
-}
+//Next functions work with Point=PointT<ll> (but you may use with doubles with some epsilon)
 // decides whether <p> is inside the oriented CCW angle (from <a> to <b>) (including bounds)
 // both <a> and <b> are nonzero
 bool inSector(const Point &a, const Point &b, const Point &p) {
-	int vab = vect(a, b);
-	if (!vab && (scal(a, b) > 0)) if (scal(a, p) < 0) return false;
+	auto vab = vect(a, b); if (!vab && (scal(a, b) > 0)) if (scal(a, p) < 0) return false;
 	if (vab >= 0) return (vect(a, p) >= 0 && vect(p, b) >= 0);
 	else		  return (vect(a, p) >= 0 || vect(p, b) >= 0);
 }
-inline bool Cross1DSegs(int l1, int r1, int l2, int r2) {//1 dimensional
-	if (l1 > r1) swap(l1, r1);
-	if (l2 > r2) swap(l2, r2);
-	return !(l1 > r2 || r1 < l2);
+template<typename T> inline bool Cross1DSegs(T l1, T r1, T l2, T r2) {//1 dimensional
+	if (l1 > r1) swap(l1, r1); if (l2 > r2) swap(l2, r2); return !(l1 > r2 || r1 < l2);
 }
-// crosses two closed line segments <p1>-<p2> and {p3>-<p4>
+// (a1,b1 - one line, a2,b2 - other line)
 bool CrossSegs(const Point &a1, const Point &b1, const Point &a2, const Point &b2) {
-    int a11 = b1.x - a1.x;
-    int a12 = a2.x - b2.x;
-    int a21 = b1.y - a1.y;
-    int a22 = a2.y - b2.y;
-    int xb1  = a2.x - a1.x;
-    int xb2  = a2.y - a1.y;
-    int det  = a11 * a22 - a12 * a21;
-    int detu = xb1 * a22 - a12 * xb2;
-    int detv = a11 * xb2 - xb1 * a21;
+    auto a11 = b1.x - a1.x; auto a12 = a2.x - b2.x;
+    auto a21 = b1.y - a1.y; auto a22 = a2.y - b2.y;
+    auto xb1 = a2.x - a1.x; auto xb2 = a2.y - a1.y;
+    auto det  = a11 * a22 - a12 * a21; auto detu = xb1 * a22 - a12 * xb2;
+    auto detv = a11 * xb2 - xb1 * a21;
     if (det == 0) {
         if (detu || detv) return false;
         if (a1.x != b1.x || a2.x != b2.x) return Cross1DSegs(a1.x, b1.x, a2.x, b2.x);
         if (a1.y != b1.y || a2.y != b2.y) return Cross1DSegs(a1.y, b1.y, a2.y, b2.y);
         return (a1 == a2);
     }
-    if (det < 0) {
-        det = -det;
-        detu = -detu;
-        detv = -detv;
-    }
+    if (det < 0) {det = -det; detu = -detu; detv = -detv; }
     return (detu >= 0 && detu <= det && detv >= 0 && detv <= det);
 }
 // determines whether point <p> lies on the closed segment <a>-<b>
 inline bool onSeg(const Point &p, const Point &a, const Point &b) {
-	if (vect(p - a, b - a)) return false;
-	if (a == b) return p == a;
+	if (vect(p - a, b - a)) return false;   if (a == b) return p == a;
 	return (scal(p - a, b - a) >= 0 && scal(p - b, a - b) >= 0);
 }
 
 // determines whether a point <p> is inside the triangle <a>-<b>-<c>
 // does not work for triangles with zero area (NOT CHECKED)
-inline int uabs(int a) { return (a < 0 ? -a : a); }
-inline bool inTriangle(const Point &p, const Point &a, const Point &b, const Point &c, bool strict = false) {
-	int tv = uabs(vect(c - a, b - a));
-	int t = uabs(vect(p - a, b - a));
-	if (strict && !t) return false;
-	tv -= t;
-	t = uabs(vect(p - b, c - b));
-	if (strict && !t) return false;
-	tv -= t;
-	t = uabs(vect(p - c, a - c));
-	if (strict && !t) return false;
-	tv -= t;
-	return tv >= 0;
+bool inTriangle(const Point &p, const Point &a, const Point &b, const Point &c, bool strict = false) {
+	auto tv = abs(vect(c - a, b - a)); auto t = abs(vect(p - a, b - a)); 
+    if (strict && !t) return false;
+	tv -= t; t = abs(vect(p - b, c - b)); if (strict && !t) return false;
+	tv -= t; t = abs(vect(p - c, a - c)); if (strict && !t) return false;
+	tv -= t; return tv >= 0;
 }
 
 // determines whether point <p> lies inside polygon <arr[0], ..., arr[n]>
@@ -138,13 +120,10 @@ bool inPolygon(const Point &p, int n, const Point *arr, bool strict = false) {
 }
 // Graham's convex hull
 // changes order of points! no equal points allowed! must have nonzero area
-//DONT forget to use EVERYWHERE double (in cmpHull, vp, Point class) when needed
 Point hctr;
 bool cmpHull(const Point &a, const Point &b) {
-    Point ad = a - hctr;
-    Point bd = b - hctr;
-    int tv = vect(ad, bd);
-    if (tv) return tv > 0; //abs(tv) > eps for real
+    Point ad = a - hctr; Point bd = b - hctr;
+    auto tv = vect(ad, bd); if (tv) return tv > 0; //abs(tv) > eps for real
     return ad.len2() < bd.len2();
 }
 //out k - size of convex hull in res, points CCW in res
@@ -155,12 +134,8 @@ void ConvexHull(int n, Point *arr, int &k, Point *res, bool strict = true) {
         if (arr[i].x < arr[best].x) best = i;
         if (arr[i].x == arr[best].x && arr[i].y < arr[best].y) best = i;
     }
-    std::swap(arr[best], arr[0]);
-    hctr = arr[0];
-    std::sort(arr+1, arr+n, cmpHull);
-    k = 0;
-    res[k++] = arr[0];
-    res[k++] = arr[1];
+    std::swap(arr[best], arr[0]); hctr = arr[0]; std::sort(arr+1, arr+n, cmpHull);
+    k = 0; res[k++] = arr[0]; res[k++] = arr[1];
     for (i = 2; i<n; i++) {
         if (strict) while (k>=2 && vect(res[k-1]-res[k-2], arr[i]-res[k-2]) <= 0) k--;
         if (!strict) while (k>=2 && vect(res[k-1]-res[k-2], arr[i]-res[k-2]) < 0) k--;
@@ -175,18 +150,18 @@ void ConvexHull(int n, Point *arr, int &k, Point *res, bool strict = true) {
     }
 }
 
-//THIS AND LATER FUNCTIONS needs real_t point, DONT forget to change ALL types EVERYWHERE to double
+//NEXT FUNCTIONS work ONLY with Point=PointT<double>
 //Line crosses Line (a1,b1 - one line, a2,b2 - other line) (infinite)
 bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Point &b2, Point &res) {
-	real_t a11 = b1.x - a1.x;
-	real_t a12 = a2.x - b2.x;
-	real_t a21 = b1.y - a1.y;
-	real_t a22 = a2.y - b2.y;
-	real_t xb1 = a2.x - a1.x;
-	real_t xb2 = a2.y - a1.y;
-	real_t det  = a11 * a22 - a12 * a21;
-	real_t detu = xb1 * a22 - a12 * xb2;
-	real_t detv = a11 * xb2 - xb1 * a21;
+	auto a11 = b1.x - a1.x;
+	auto a12 = a2.x - b2.x;
+	auto a21 = b1.y - a1.y;
+	auto a22 = a2.y - b2.y;
+	auto xb1 = a2.x - a1.x;
+	auto xb2 = a2.y - a1.y;
+	auto det  = a11 * a22 - a12 * a21;
+	auto detu = xb1 * a22 - a12 * xb2;
+	auto detv = a11 * xb2 - xb1 * a21;
 	if (abs(det) < eps) return false; //parallel (detu!=0) or coincide (detu=0)	
 	detu /= det;
 	detv /= det;
@@ -197,36 +172,25 @@ bool CrossLineLine(const Point &a1, const Point &b1, const Point &a2, const Poin
 //Even in case of touch, later functions return 2 points, you should check if they coincide
 //Line (la, lb) crosses Circle (center cc, radius cr) (infinite)
 bool CrossLineCircle(const Point &la, const Point &lb, const Point &cc, real_t cr, Point &res1, Point &res2) {
-	Point st = la - cc;
-	Point dir = lb - la;
-	real_t qa = scal(dir, dir);
-	real_t qb = 2.0 * scal(st, dir);
-	real_t qc = scal(st, st) - cr * cr;
-	real_t qd = qb * qb - 4.0 * qa * qc;
-	if (qd < -eps) return false;
-	if (qd < 0.0) qd = 0.0;
-	qd = sqrt(qd);
-	real_t x1 = (-qb - qd) / (2.0 * qa);
-	real_t x2 = (-qb + qd) / (2.0 * qa);
-	res1 = la + dir * x1;
-	res2 = la + dir * x2;
-	return true;
-}
+	Point st = la - cc; Point dir = lb - la;
+	auto qa = scal(dir, dir); auto qb = 2.0 * scal(st, dir); 
+    auto qc = scal(st, st) - cr * cr; auto qd = qb * qb - 4.0 * qa * qc;
+	if (qd < -eps) return false; 
+	if (qd < 0.0) qd = 0.0; qd = sqrt(qd); 
+    auto x1 = (-qb - qd) / (2.0 * qa); auto x2 = (-qb + qd) / (2.0 * qa);
+	res1 = la + dir * x1; res2 = la + dir * x2; return true;
+}   
 //Circle (center c1, radius r1) crosses Circle (center c2, radius r2)
 bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, Point &res1, Point &res2) {
-	real_t la = 2.0 * (c2.x - c1.x);
-	real_t lb = 2.0 * (c2.y - c1.y);
-	real_t lc = sqr(c1.x) - sqr(c2.x) + sqr(c1.y) - sqr(c2.y) + sqr(r2) - sqr(r1);
+	auto la = 2.0 * (c2.x - c1.x);
+	auto lb = 2.0 * (c2.y - c1.y);
+	auto lc = sqr(c1.x) - sqr(c2.x) + sqr(c1.y) - sqr(c2.y) + sqr(r2) - sqr(r1);
 	if (la * la + lb * lb < eps) return false; //circle or coincide or no intersection (based on radius)
 	Point a, b;
 	if (abs(la) > abs(lb)) { //Logic can be used to build 2 points based on normal line equation
-		a = Point(-lc / la, 0.0);
-		b = Point(-(lb + lc) / la, 1.0);
+		a = Point(-lc / la, 0.0); b = Point(-(lb + lc) / la, 1.0);
 	}
-	else {
-		a = Point(0.0, -lc / lb);
-		b = Point(1.0, -(lc + la) / lb);
-	}
+	else { a = Point(0.0, -lc / lb); b = Point(1.0, -(lc + la) / lb);}
 	return CrossLineCircle(a, b, c1, r1, res1, res2);
 }
 //*******************************************HASHES******************************
@@ -270,7 +234,9 @@ H getSubstrHash(const vector<H>& prefHashes, int l, int r) {//get [l;r] hash
     assert(l<=r && r<Sz(prefHashes));
     H res = prefHashes[r]; if (l) res = res-prefHashes[l-1];
     res.shiftLeft(l); return res;
-}
+}//Sometimes binsearch in array faster than seach in unordered_set
+//In add,sub,mul avoid mod ops as possible (in mul guard by if works faster in this case)
+//Window processing may be faster then prefix precalc and extract range
 //*****************************Euler tour*******************
 vector<int> path;//MUST clear before use. Exists if number of odd verts 0 (or 2, then patch by edge)
 void dfs(int v) {//MUST reverse printed cycle when orinted edges
@@ -281,7 +247,8 @@ void dfs(int v) {//MUST reverse printed cycle when orinted edges
 }
 // ******************************* Gauss *********************
 int n, m;//IN n - rows, m - cols
-real_t matr[maxn][maxn];//IN/OUT matr[N][M]. For Ax=B equation put B in m+1 col, else put there 0s
+real_t matr[maxn][maxn];//IN/OUT matr[N][M]. For Ax=B equation put B in m+1 col
+//if without B, replace <=m to <m (and u=m to u=m-1) (4 times total)
 int r;//OUT: count of non-zero rows after diag (rank)
 int adr[maxn];//id of non-null column in row
 bool used[maxn];//OUT: if column non-empty (i.e. var not free)
@@ -345,6 +312,8 @@ int LCA(int a, int b) {
 	if (a != b) a = par[0][a];
 	return a;
 }
+//Rq time O(log n). For fast write euler tour of tree  (write vertex on enter and 
+//after each child) and do RMQ via sparse table (look to suffmass.cpp)
 // ******************************* DSU **********************************
 int parent[maxn], sz[maxn];//parent link and component sz
 void make_set(int v) {//MUST be called for each v before usage

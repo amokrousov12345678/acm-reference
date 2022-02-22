@@ -54,7 +54,7 @@ void build_lcp() {
 			lcps[pos[i]] = k;
 		}
 	}
-
+    //just sparse table, which can be used for any other purposes (lcps[i] - ref array)
 	for (int i=0;i<l;i++) lcpLifts[0][i] = lcps[i];
 	int sz = 2;
 	for (int i=1;i<=log_2;i++) {
@@ -65,7 +65,7 @@ void build_lcp() {
 }
 
 int lcpKasai(int i, int j) { //lcp.rmq[pos(i);pos(j)) O(1) sparse table
-	i = pos[i]; j = pos[j]; if (i>j) swap(i,j);
+	i = pos[i]; j = pos[j]; if (i>j) swap(i,j);//don't forget SWAP
 	if (i==j) return l;
 	int t = __lg(j-i);
 	return min(lcpLifts[t][i], lcpLifts[t][j - (1 << t)]);
