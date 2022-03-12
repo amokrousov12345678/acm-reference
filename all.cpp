@@ -11,7 +11,7 @@ inline int getChar() {
 inline int readChar() {
     int c = getChar(); while (c <= 32) {c = getChar();} return c;
 }
-template <class T>
+template <class T = int>
 inline T readInt() {
     int s = 1, c = readChar(); T x = 0;
     if (c == '-') {s = -1; c = getChar();}
@@ -20,22 +20,21 @@ inline T readInt() {
 }
 //Write
 static int write_pos = 0; static char write_buf[buf_size];
-inline void writeChar( int x ) {
+inline void writeChar(int x) {
     if (write_pos == buf_size) {fwrite(write_buf, 1, buf_size, stdout); write_pos = 0;}
     write_buf[write_pos++] = x;
 }
-template <class T>
-inline void writeInt( T x, char end ) {
+template <class T = int>
+inline void writeInt(T x, char end = '\0') {
     if (x < 0) {writeChar('-'); x = -x;}
     char s[24]; int n = 0;
     while (x || !n) {s[n++] = '0' + x % 10; x /= 10;}
     while (n--) {writeChar(s[n]);} if (end) {writeChar(end);}
 }
-inline void writeWord( const char *s ) { while (*s) writeChar(*s++);}
-//Scoped flusher
+inline void writeWord(const char *s) { while (*s) writeChar(*s++);}
 struct Flusher {
     ~Flusher() {if (write_pos) {fwrite(write_buf, 1, write_pos, stdout); write_pos = 0;}}
-} flusher;
+} flusher;//this MUST be in source to flush on app exit
 // ***************** Setting the line up in the bitset *****************
 inline const bool test(dword *arr, const int &x) {//getBit
 	return (arr[x >> 5] >> (x & 31)) & 1;
