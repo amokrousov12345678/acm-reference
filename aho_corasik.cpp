@@ -55,7 +55,7 @@ void search(const char *st) {//pres MUST be zeroed before call
 					pres[same_words[nodes[v].end][i]] = 1;
 	}
 }
-int getShortSuff(int v) {//lazy eval of cSuff, may also calc some dp so
+int getShortSuff(int v) {//lazy eval of cSuff, may also calc some lazy dp in same way
 	if (nodes[v].cSuff == -1) {
 		if (nodes[nodes[v].suff].end != -1) nodes[v].cSuff = nodes[v].suff;
 		else if (nodes[v].suff == root) nodes[v].cSuff = root; 

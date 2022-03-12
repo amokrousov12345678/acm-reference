@@ -5,7 +5,8 @@ char s[maxl]; //input string ('\0' terminated)
 
 struct node { //vertex correspond to class of string with equal endpos sets
 	int next[maxa], suff, len, end;//end - if terminal, len - longest string in endpos equality class 
-	//suff - link to vertex of class of longest suffix which still isn't in same class as string
+	//suff - link to vertex of class of longest suffix which not in same class as string
+    //strings is class is suffixes of longest string with len in range (len(suf(v));len(v)]
 	//to find all occurences of string, do dfs on reverse suf links tree (+DON'T PRINT clones, but TRAVERSE them)
 	int firstPos;//first endpos of vertex
 } nodes[maxn];
@@ -45,4 +46,12 @@ void create_automata() {
 	last = root = new_node(0);
 	for (i = 0; i < l; ++i) extend(s[i], last);
 	for (i = last; i >= 0; i = nodes[i].suff) nodes[i].end = 1;
+}//to build SA on several strings, connect them through "$" and don't go by "$"
+string lcs (string s, string t) {
+	int v = 0,  l = 0, best = 0,  bestpos = 0; //you MUST have built automaton on s
+	for (int i=0; i<(int)t.length(); ++i) {
+        while (v && (nodes[v].next[numc(t[i])]==-1)) {v = nodes[v].suff; l = nodes[v].len;}
+        if (nodes[v].next[numc(t[i])]!=-1) {v = nodes[v].next[numc(t[i])]; ++l;}
+        if (l > best) {best = l;  bestpos = i;}//now "l" - max len of lcs ended in t[i]
+    } return t.substr (bestpos-best+1, best);
 }

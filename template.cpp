@@ -2,9 +2,9 @@
 //set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -fsanitize=address -fsanitize=undefined")
 //#pragma GCC optimize("Ofast,no-stack-protector,unroll-loops,fast-math")
 //#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,avx2,fma")//drop avx and fma if RE#1
-//(on Yandex. On NSUts remove also avx)
+//(on Yandex, NSUts remove also avx)
 ////#pragma GCC optimize("O3,no-stack-protector,unroll-loops") FOR GEOM INSTEAD OF 1st
-////#pragma comment(linker, ”/STACK:36777216“) (for Studio if get ML on GCC)
+////#pragma comment(linker, "/STACK:36777216") (for Studio if get ML on GCC)
 using namespace std;
 #ifdef ILIKEGENTOO
 void E(){}template<class A,class...B>void E(A $,B..._){cerr<<' '<<$;E(_...);}
@@ -42,7 +42,7 @@ int main() {
 //For tight ML: c++ io, vectors have very low impact (about 100kb). But compiler version/bitness 
 //TL: vector<vector<>> makes A LOT heap allocations, so may be slower 10 times than just vector<int>
 //is important factor. DFS may cause ML (big recursion). On rect grid use BFS
-//euler formula: n - m + f = 2: m <= 3*n-6 - for planarity; n-verts, m - edges, f - faces (with outer)
+//Euler formula: n - m + f = 1+cc: m <= 3*n-6 - for planarity; n-verts, m - edges, f - faces (with outer)
 //simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x_(2n-1))+f(x_(2n)))*h/3 points [x0..x_(2n)] evenly
 //f(n) = sum(d|n) g(d) <=> g(n) = sum(d}n)(mu(d)*f(n/d)) (mobius inversion). n = sum(d|n)phi(d)
 //Kotlovan numbers: C(n) = sum(i=0;i<=n-1)(C(i)*C(n-1-i)) = 1/(n+1)*Binom(2n,n). 
@@ -54,5 +54,6 @@ int main() {
 //Second part accept rebind if new option better. Continue until all matched or pref lists exhausted.
 //Pik formula: S = I+B/2 -1. S-area, I-count int points inside, B-count int points of bound. S must be >0
 //std::string_stream is cool thing to tokenize string)
+//L1 (|x|+|y|) metric with replace x'=x+y, y'=x-y transformed to Linf (max(|x|,|y|))
 System.setIn(new FileInputStream("input.txt"));//LONG ARITHM, BigInteger immutable)
 Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));

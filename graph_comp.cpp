@@ -48,7 +48,7 @@ void dfsBridges(int v, int par = -1) {
 //Biconn. component of edges - set of edges, each pair have at least 2 VERT independent paths between ends
 //Found by algo below
 vector<int> compId[maxn];//OUT compId[u][id] - id of biconn component of edge g[u][id]
-
+//When do g[u].pb(v) MUST back[v].pb(Sz(g[u])) and symm (g[g[u][i]][back[u][i]] is rev edge for g[u][i])
 vector<int> back[maxn];
 pair<int, int> stck[maxe];
 int ssize = 0;//MUST be set to 0 before call

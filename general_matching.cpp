@@ -2,7 +2,7 @@
 int mat[maxn][maxn], a[maxn][maxn], idx[maxn], iidx[maxn], has[maxn];//auxillary arrays
 mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 uniform_int_distribution<> distr(1, mod - 1);
-//n - number of verts, ed - edges of graph (as pair of ends). Return edges in matching in   same form
+//n - number of verts, ed - edges of graph (as pair of ends). Return edges in matching in same form
 vector<pair<int, int>> matching(int n, vector<pair<int, int>>& ed)
 {
     for (int i=0;i<n;i++) {idx[i]=i; iidx[i]=i; has[i]=0;}

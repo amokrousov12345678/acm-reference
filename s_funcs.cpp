@@ -13,7 +13,7 @@ void prefix_function(const char *s, int *pi) {
 void z_function(const char *st, int *z) {//Z[i] = max common prefix of S[0..n-1] and S[i..n-1]
 	int i, j = 0, r = 0, l;
 	z[0] = l = strlen(st);
-    z[l] = '#';
+    //z[l] = '#';
 	for (i = 1; i < l; ++i) {
         if (i <= r)
             z[i] = min(r - i, z[i - j]);

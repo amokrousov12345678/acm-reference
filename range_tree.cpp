@@ -82,7 +82,7 @@ struct segtree {
 struct segtree {//persistent (WIHTOUT group ops, for them adopt upper version (THINK 150 TIMES!!!))
     static val_t rqOp(val_t lhs, val_t rhs) {return lhs+rhs;}
     struct Node {
-        Node *l, *r; val_t val; Node(): l(nullptr), r(nullptr), val(0) {};
+        Node *l, *r; val_t val; Node(): l(nullptr), r(nullptr), val(neutral) {};
         Node(Node *l, Node *r): l(l), r(r) { val = rqOp((l ? l->val : neutral), (r? r->val : neutral));}
     };
 	
@@ -90,15 +90,15 @@ struct segtree {//persistent (WIHTOUT group ops, for them adopt upper version (T
         if (l==r) return new Node();
         int m = (l+r)/2; return new Node(build(l, m), build(m+1, r));
     }
-    Node* modify(int pos, int delta, Node* v, int l  = 0, int r = size-1) {
-        if (l==r) {auto tmp = new Node(*v); tmp->val = v->val + delta; return tmp;}
+    Node* modify(int pos, val_t newVal, Node* v, int l  = 0, int r = size-1) {
+        if (l==r) {auto tmp = new Node(*v); tmp->val = newVal; return tmp;}
         int m = (l+r)/2;
-        auto lCh = pos<=m ? modify(pos, delta, v->l, l, m) : v->l;
-        auto rCh = pos>m ? modify(pos, delta, v->r, m+1, r) : v->r;
+        auto lCh = pos<=m ? modify(pos, newVal, v->l, l, m) : v->l;
+        auto rCh = pos>m ? modify(pos, newVal, v->r, m+1, r) : v->r;
         return new Node(lCh, rCh);
     }
     val_t query(int rq_l, int rq_r, Node* v, int l = 0, int r = size-1) {
-        if (l > rq_r || r < rq_l) return 0;
+        if (l > rq_r || r < rq_l) return neutral;
         if (rq_l <=l && r<=rq_r) return v->val;
         int m = (l+r)/2;
         val_t res = rqOp(query(rq_l, rq_r, v->l, l, m), query(rq_l, rq_r, v->r, m+1, r));
