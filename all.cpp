@@ -1,4 +1,5 @@
-// ***************** Fast IO **********
+// ***************** Fast IO (noticeably faster than cin/cout)**********
+//Printf/scanf almost no profit agains cin/cout with sync_with_stdio
 #include <cstdio>
 //Read
 static const int buf_size = 4096;
