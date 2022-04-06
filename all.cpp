@@ -232,6 +232,11 @@ bool CrossCircleCircle(const Point &c1, real_t r1, const Point &c2, real_t r2, P
 	return CrossLineCircle(a, b, c1, r1, res1, res2);
 }
 //*******************************************HASHES******************************
+//For set: sort items and get polyhash of this sequence
+//For rooted tree: for leaf - some const, for node - hash of sorted child hashes sequence
+//CAUTION: polyhash don't work here, use [sum(i=0 to k)((a_i)^2+a_i*p^i+3)] mod 2^64
+//Or store in hashset polyhash of vector<H> for children. Hash of some subtree - id in set (1-started)
+//Sometimes useful to use non-poly hash is you don't need to extract substr
 namespace HPar {//when change SZ MUST copypaste logic for other base(s) EVERYWHERE
     const int SZ = 1;//Primitives: (3(27)(243) by 998244353, 5(125) by 1e9+7, 13 by 1e9+9)
     int mods[SZ], base[SZ], invBase[SZ], basePows[SZ][maxn], invBasePows[SZ][maxn];
