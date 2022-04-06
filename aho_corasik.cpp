@@ -26,8 +26,7 @@ void add_word(const char *st, int num) {
 }
 int q[maxn]; //queue for bfs through vertices
 void aho_corasik() { //(only suffix links) automaton construction
-	assert(cnt>0); 
-	nodes[root].suff = root;
+	assert(cnt>0); nodes[root].suff = root;
 	int l, r = 0, i, u, nx;
 	for (i = 0; i < maxa; ++i)
 		if ((nx = nodes[root].next[i]) != -1) {
