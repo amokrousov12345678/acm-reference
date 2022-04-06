@@ -39,12 +39,12 @@ struct fenvic_t { //for multiple dimensions loops by each index
     val_t query(int l, int r) {
         return query(r) - query(l-1);
     }
-};
+};//faster than segtree. But if min/max 1.) only on prefix 2.) all updates only dec/inc
 //for recursive, we need recreate vertices on ANY change, even when push (otherwise children are desync)
 struct segtree {
     val_t mas[4*size]; const static val_t neutral = 0;
     pval_t def[4*size]; const static pval_t neutralUpdate = 0;
-    val_t applyUpdate(val_t val, pval_t push) {};//apply update to  vertex
+    val_t applyUpdate(val_t val, pval_t push) {};//apply update to  vertex. May pass len (r-m or m-l+1)
     val_t rqOp(val_t lhs, val_t rhs) {}//op for range query
     pval_t combineUpdates(pval_t cur, pval_t fromUp) {return cur+fromUp;};//apply def[par] into def[v]
 
@@ -74,11 +74,7 @@ struct segtree {
         mas[v] = rqOp(applyUpdate(mas[2*v], def[2*v]), applyUpdate(mas[2*v+1], def[2*v+1]));
         return ans;
     }
-    //TODO: add bin search (from left)
 };
-//LiChao tree: store line in vert. On process vert: choose best (min/max) among newF and mas[v] in pnt m
-//Based on comparison in pnt l, in one half newF never could be optimal, descend to other
-//Leafs trivially updated. Answer to query: best in given point on path to leaf
 struct segtree {//persistent (WIHTOUT group ops, for them adopt upper version (THINK 150 TIMES!!!))
     static val_t rqOp(val_t lhs, val_t rhs) {return lhs+rhs;}
     struct Node {
@@ -105,3 +101,24 @@ struct segtree {//persistent (WIHTOUT group ops, for them adopt upper version (T
         return res;
     }
 };//for lazy on big range create children for vertex on demand
+//LiChao Tree
+struct line {
+    int k = 0, m = 0; line() {}; line(int k, int m): k(k), m(m) {}
+    int get(int x) {return k * x + m;}
+};
+line t[4 * MAXN];
+void upd(int v/*=1/, int tl/*=0*/, int tr=/*n-1*/, line L) {//add line (monoton f_i(x))
+    if (tl > tr) return;
+    int tm = (tl + tr) / 2; bool l = L.get(tl) > t[v].get(tl); bool mid = L.get(tm) > t[v].get(tm);
+	if (mid) swap(L, t[v]);
+    if (l != mid) upd(2 * v, tl, tm - 1, L) else upd(2 * v + 1, tm + 1, tr, L);
+}
+int get(int v, int tl, int tr, int x) {//for given x query [max f_i(x)]
+	if (tl > tr) return 0;
+	int tm = (tl + tr) / 2; if (x == tm) return t[v].get(x);
+    if (x < tm) {
+        return max(t[v].get(x), get(2 * v, tl, tm - 1, x));
+    } else {
+        return max(t[v].get(x), get(2 * v + 1, tm + 1, tr, x));
+    }
+}

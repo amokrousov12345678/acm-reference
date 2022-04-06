@@ -8,7 +8,7 @@ vector<int> revg[maxn];
 vector<int> que, component;
 int compCnt;
 
-void dfs_fwd(int v) {
+void dfs_fwd(int v) {//actually topsort
     visit[v] = true;
     for (int u : g[v]) if (!visit[u]) dfs_fwd(u);
     que.push_back(v);

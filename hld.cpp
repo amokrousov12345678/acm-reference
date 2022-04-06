@@ -36,7 +36,7 @@ int get(int u, int v) {
 	int ans = 0;
 	while (root[u] != root[v]) {
 		if (depth[root[u]] < depth[root[v]]) swap(u, v);
-		ans = max(ans, rmq.query(pos[root[u]], pos[u])) ;
+		ans = op(ans, rmq.query(pos[root[u]], pos[u])) ;
 		u = par[root[u]];
 	}
 	if (depth[u] < depth[v]) swap(u, v) ;

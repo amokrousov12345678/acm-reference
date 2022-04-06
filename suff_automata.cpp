@@ -13,8 +13,7 @@ struct node { //vertex correspond to class of string with equal endpos sets
 int root, cnt;
 inline int new_node(int len) {
 	memset(nodes + cnt, -1, sizeof(node));
-	nodes[cnt].len = len;
-	nodes[cnt].end = 0;
+	nodes[cnt].len = len; nodes[cnt].end = 0; nodes[cnt].firstPos = 0;
 	return cnt++;
 }
 void extend(char c, int &last) {
@@ -42,13 +41,13 @@ void extend(char c, int &last) {
 		nodes[p].next[numc(c)] = nq;
 }
 void create_automata() {
-	int l = strlen(s), i, last;
+	int l = strlen(s), i, last; cnt = 0;
 	last = root = new_node(0);
 	for (i = 0; i < l; ++i) extend(s[i], last);
 	for (i = last; i >= 0; i = nodes[i].suff) nodes[i].end = 1;
 }//to build SA on several strings, connect them through "$" and don't go by "$"
-string lcs (string s, string t) {
-	int v = 0,  l = 0, best = 0,  bestpos = 0; //you MUST have built automaton on s
+string lcs (string s, string t) {//works only with root=0
+	int v = 0,  l = 0, best = 0, bestpos = 0; //you MUST have built automaton on s
 	for (int i=0; i<(int)t.length(); ++i) {
         while (v && (nodes[v].next[numc(t[i])]==-1)) {v = nodes[v].suff; l = nodes[v].len;}
         if (nodes[v].next[numc(t[i])]!=-1) {v = nodes[v].next[numc(t[i])]; ++l;}
