@@ -67,9 +67,18 @@ Node* merge(Node* root1, Node* root2) {
         root2->left = merge(root1, root2->left); recalc(root2); return root2;
     }//for persist, if sz1=L, sz2=R, choose root 1 with prob L/(L+R). Otherwise O(N) contertest
 }
-Node* insert(Node* root, Node* node) {//DOESNT WORK FOR IMPLICIT TREAP
-    auto split1 = split(root, node->pk); return merge(split1.first, merge(node, split1.second));
-}
 Node* getLeftMost(Node* root) {if (root->left) return getLeftMost(root->left); else return root;}
-//to erase: cur less + cut equal, merge less and more
-//to apply group op: cut tree with segment and put change to root
+//Optimized typical ops (for NOT implicit treap)
+Node* insert(Node* root, Node* node) {//TRIVIAL WAY: merge(<x, merge(newItem, >=x))
+    if (!root) return node; push(root);
+    if (node->sk < root->sk) {
+        auto res = split(root, node->pk); node->l = res.first; node->r = res.second; return node;
+    } else { return insert(node->pk < root->pk ? node->l : node->r, it);}
+}
+Node* erase(Node* root, pkey_t key) {//TRIVIAL WAY: split(x), merge(rootR->l, rootR->r), merge back
+    assert(root); push(root);
+    if (root->pk == key) return merge(root->left, root->right);
+    else erase(key < root->pk ? root->left : root->right, key);
+}
+//to apply group op: cut tree with segment and put change to root. MAGIC works
+//to make rq - same thing (
