@@ -21,7 +21,7 @@ const ll infLL = 0x3f3f3f3f3f3f3f3f;
 struct hash_pair { //to allow unordered_map<pair<int, int>, bool, hash_pair>
 	template <class T1, class T2> size_t operator()(const pair<T1, T2>& p) const {
 		auto hash1 = hash<T1>{}(p.first); auto hash2 = hash<T2>{}(p.second); return hash1 ^ hash2;}};
-
+// __builtin_popcount
 #include <ext/pb_ds/assoc_container.hpp> // Main file
 #include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
 using namespace __gnu_pbds;
@@ -32,15 +32,19 @@ uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
 
 std::random_device rd; std::mt19937 rng{rd()}; std::mt19937 randMT(rng);//uniform int [a;b]
 int blessRng(int a, int b) { std::uniform_int_distribution<int> rang(a, b); return rang(randMT);}
-int main() {
+int main() {    
 	cin.tie(0); cout.tie(0);
-    ios_base::sync_with_stdio(false);//AHTUNG: esli zabudesh, TL ottarabanit
+    ios_base::sync_with_stdio(false);//WARNING: esli zabudesh, TL (krodet'sya)
 	cout << setprecision(15) << fixed;
 	//((float)(clock() - t0)) / CLOCKS_PER_SEC
     return 0;
 }
-//For tight ML: c++ io, vectors have very low impact (about 100kb). But compiler version/bitness 
+const int MAX_MEM = 1e8; int mpos = 0; //Fast allocator (danger, use ONLY as last chance!)
+char mem[MAX_MEM]; inline void * operator new ( size_t n ) {char *res = mem + mpos; mpos += n;
+assert(mpos <= MAX_MEM); return (void *)res; }; inline void operator delete ( void * ) { }
+//For tight ML: c++ io, vectors have very low impact (about 100kb). But COMPILER VERSION/BITNESS
 //TL: vector<vector<>> makes A LOT heap allocations, so may be slower 10 times than just vector<int>
+//Or use vector<int> arr[maxn] and cleanup. Try to compress coords to avoid use of map
 //is important factor. DFS may cause ML (big recursion). On rect grid use BFS
 //Euler formula: n - m + f = 1+cc: m <= 3*n-6 - for planarity; n-verts, m - edges, f - faces (with outer)
 //simpson integrate: (f(x0)+4f(x1)+2f(x2)+4f(x3)+..+4f(x_(2n-1))+f(x_(2n)))*h/3 points [x0..x_(2n)] evenly
