@@ -68,17 +68,22 @@ Node* merge(Node* root1, Node* root2) {
     }//for persist, if sz1=L, sz2=R, choose root 1 with prob L/(L+R). Otherwise O(N) contertest
 }
 Node* getLeftMost(Node* root) {if (root->left) return getLeftMost(root->left); else return root;}
-//Optimized typical ops (for NOT implicit treap)
+//Optimized typical ops. May be used in implicit if replace pk with lSz
 Node* insert(Node* root, Node* node) {//TRIVIAL WAY: merge(<x, merge(newItem, >=x))
     if (!root) return node; push(root);
     if (node->sk < root->sk) {
-        auto res = split(root, node->pk); node->l = res.first; node->r = res.second; return node;
-    } else { return insert(node->pk < root->pk ? node->l : node->r, it);}
+        auto res = split(root, node->pk); node->left = res.first; node->right = res.second; return node;
+    } else {
+        if (node->pk < root->pk) root->left = insert(root->left, node);
+        else root->right = insert(root->right, node); return root;
+    }
 }
 Node* erase(Node* root, pkey_t key) {//TRIVIAL WAY: split(x), merge(rootR->l, rootR->r), merge back
     assert(root); push(root);
     if (root->pk == key) return merge(root->left, root->right);
-    else erase(key < root->pk ? root->left : root->right, key);
+    else {
+        if (key < root->pk) root->left = erase(root->left, node);
+        else root->right = erase(root->right, node); return root;
+    }
 }
 //to apply group op: cut tree with segment and put change to root. MAGIC works
-//to make rq - same thing (
