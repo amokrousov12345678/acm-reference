@@ -114,7 +114,7 @@ bool inSector(const Point &a, const Point &b, const Point &p) {
 template<typename T> inline bool Cross1DSegs(T l1, T r1, T l2, T r2) {//1 dimensional
 	if (l1 > r1) swap(l1, r1); if (l2 > r2) swap(l2, r2); return !(l1 > r2 || r1 < l2);
 }
-// (a1,b1 - one line, a2,b2 - other line)
+// (a1,b1 - one seg, a2,b2 - other seg)
 bool CrossSegs(const Point &a1, const Point &b1, const Point &a2, const Point &b2) {
     auto a11 = b1.x - a1.x; auto a12 = a2.x - b2.x;
     auto a21 = b1.y - a1.y; auto a22 = a2.y - b2.y;

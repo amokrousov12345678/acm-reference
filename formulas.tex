@@ -31,7 +31,7 @@
 				\item $\sum \limits_{i=0}^n{2n \choose i}=2^{2n-1}+\frac{1}{2}{2n \choose n}$
 				\item $\sum \limits_{i=1}^n{n \choose i}{n-1 \choose i-1}={2n-1 \choose n-1}$
 				\item $\sum \limits_{i=0}^n{2n \choose i}^2=\frac{1}{2} \left( {4n \choose 2n}+{2n \choose n}^2 \right)$
-				\item $\left(\frac{m}{n}\right) \equiv \prod_{i=0}^{k} \left(\frac{m_{i}}{n_{i}}\right) (mod\; p)$
+				\item ${{m} \choose {n}} \equiv \prod_{i=0}^{k} {{m_{i}} \choose {n_{i}}} (mod\; p)$
 			\end{enumerate}
 		\end{flushleft}
 	\end{minipage}
@@ -39,7 +39,7 @@
 \begin{large}
 	\begin{enumerate}
 		\setcounter{enumi}{16}
-		\item $\left( \frac{b-(n-1)(k-1)}{n} \right)$ - number of choices n int ids from [1..k], each have dist at least k
+		\item $\left( \frac{b-(n-1)(k-1)}{n} \right)$ - number of choices n int ids from [1..b], each have dist at least k
 		\item $d(n)=(n-1) \cdot (d(n-1)+d(n-2)),\;\; d(0)=1,d(1)=0$ - num of derangements
 		\item $a(n)=a(n-1) + (n-1)a(n-2),\;\;a(0) = a(1) = 1$ - num of involutions
 		\item $T(n, k)= n \cdot T(n-1, k) - F(n-1, k) \cdot T(n-k-1, k)$ if $n > k$. Otherwise $T(n,k)=n!$ - num of perm with all cycles len $\leq$ k. $F(n, k) = n \cdot (n - 1) \cdot … \cdot (n - k + 1)$

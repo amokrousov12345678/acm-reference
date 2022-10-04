@@ -26,7 +26,7 @@ void z_function(const char *st, int *z) {//Z[i] = max common prefix of S[0..n-1]
 		}
 	}
 }
-// Lyndon decomposition and minimal cyclical shift search in O(n) (NOT CHECKED)
+// Lyndon decomposition and minimal cyclical shift search in O(n)
 string min_cyclic_shift(string s) {
 	s += s;
 	int n = (int) s.length();

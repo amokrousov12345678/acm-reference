@@ -1,7 +1,7 @@
 // ****** Hungarian algorithm (min cost assignment on n*m grid) ************************
 int n, m; //IN n - row count, m - col count (MUST n<=m)
 val_t c[maxn][maxn]; //IN: input matrix (1-based!!!!!)
-int p[maxn]; // answer: p[i] for 1<=i<=m - id row assigned to col i (1-based!!!!)
+int p[maxn]; // OUT: p[i] for 1<=i<=m - id row assigned to col i (1-based!!!!)
 //auxillary arrays:
 int prv[maxn], nw[maxn];
 val_t u[maxn], v[maxn], minv[maxn];//u,v, s.t. u[i]+v[j]<=c[i][j] and sum u + sum v -> max

@@ -3,7 +3,7 @@ vector<int> g[maxn];//MUST BE undirected if edge (a,b) then should be (b,a)
 int used[maxn];
 int match[maxn];//match vert id (correct for verts from both parts)
 int cc; //num of found edges
-//|MinVertexCover| = N - |MaxIndSet| (complem. to any vert cover is indep. set)
+//|MinVertexCover| = N - |MaxIndSet| (complementary to any vert cover is indepedent set)
 //|MinVertexCover| = |Matching| (for bipartite).
 //How to build: matching edges as R->L, other L->R, dfs from all FREE vertices in L
 //+,- about visited. Then L- union R+ is ans (easy to prove from L+R- is ind.set)

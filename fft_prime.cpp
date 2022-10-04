@@ -45,6 +45,7 @@ vector<int> mul(vector<int> a, vector<int> b) {
 //FWHT: (a b) => (a+b a-b) (for inv should div by 2)	
 //inv series: A(x)*Bn(x) = 1 + x^n*C(x): B1 = A(x)[0]^-1, B2k = Bk*(2-A*Bk) 
 //from A taken 2k summands, mul in 4k window and select only 2k summands from result
-//if multidimensial expand by first, than by second, etc (by completed dimension select only N summands is enough)
+//if multidimensial expand by first, than by second, etc
+//(by completed dimension select only N summands is enough)
 //division: deg A = m, degB = n. A = BQ + R, Br, Ar, Qr - polys with reverse coeff order,
 //D - (m+1-n) first of Br. Then Qr = D*A (m-n+1 coeffs, need to reverse)

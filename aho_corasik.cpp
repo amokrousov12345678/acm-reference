@@ -11,8 +11,7 @@ vector<int> same_words[maxw]; //indexes of words equal to given (written as node
 int word_lens[maxw]; //len of word with id
 
 int new_node() {
-	memset(nodes + cnt, -1, sizeof(node));
-	return cnt++;
+	memset(nodes + cnt, -1, sizeof(node)); return cnt++;
 }
 void init() { cnt = 0; new_node(); } //MUST be called before begin use of trie
 void add_word(const char *st, int num) {
@@ -21,7 +20,7 @@ void add_word(const char *st, int num) {
 		if (nodes[v].next[numc(*st)] == -1) nodes[v].next[numc(*st)] = new_node();
 		v = nodes[v].next[numc(*st)];
 	}
-	if (nodes[v].end == -1) nodes[v].end = num;
+	if (nodes[v].end == -1) {nodes[v].end = num; same_words[num].clear();}
 	same_words[nodes[v].end].push_back(num);
 }
 int q[maxn]; //queue for bfs through vertices

@@ -1,4 +1,4 @@
-int par[maxn]; //parent
+int par[maxn]; //parent. MUST clean before reuse
 int sz_sub[maxn]; //subtree sz
 int mx[maxn]; //"heavy" child (actually non-light) or "-1"
 int pos[maxn]; //pos of vertex in segtree
@@ -32,7 +32,7 @@ void build_array () {//then this
 		}
 	}
 }
-int get(int u, int v) {
+int get(int u, int v) {//query op(path from u to v)
 	int ans = 0;
 	while (root[u] != root[v]) {
 		if (depth[root[u]] < depth[root[v]]) swap(u, v);
