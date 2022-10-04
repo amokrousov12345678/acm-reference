@@ -2,8 +2,8 @@
 int phi(int n) {
     int res = n;
     for (int i = 2; i * i <= n; ++i) if (!(n % i)) {
-        res /= n;
-        res *= n - 1;
+        res /= i;
+        res *= i - 1;
         for ( ; !(n % i); n /= i) ;
     }
     if (n > 1) { res /= n; res *= n - 1; }
