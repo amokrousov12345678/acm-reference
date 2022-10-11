@@ -37,6 +37,7 @@ struct Flusher {
     ~Flusher() {if (write_pos) {fwrite(write_buf, 1, write_pos, stdout); write_pos = 0;}}
 } flusher;//this MUST be in source to flush on app exit
 // ***************** Setting the line up in the bitset *****************
+//std::bitset contains useful .count, ._Find_first(), ._Find_next(predIdx)
 inline const bool test(dword *arr, const int &x) {//getBit
 	return (arr[x >> 5] >> (x & 31)) & 1;
 }
@@ -58,7 +59,6 @@ inline void setLine(dword *arr, int l, int r) {
 	arr[ri] |= getMask(0, r + 1 - (ri << 5));
 	for (int i = li + 1; i <= ri - 1; ++i) arr[i] = dword(-1);
 }
-
 // **************************** all submasks ***************************
 for (int s = m; ;s = (s - 1) & m) {
     do_smth(s);
@@ -115,6 +115,7 @@ template<typename T> inline bool Cross1DSegs(T l1, T r1, T l2, T r2) {//1 dimens
 	if (l1 > r1) swap(l1, r1); if (l2 > r2) swap(l2, r2); return !(l1 > r2 || r1 < l2);
 }
 // (a1,b1 - one seg, a2,b2 - other seg)
+//Line between 2 points equation: A(y2-y1)+B(x1-x2) = x1*y2 - x2*y1;
 bool CrossSegs(const Point &a1, const Point &b1, const Point &a2, const Point &b2) {
     auto a11 = b1.x - a1.x; auto a12 = a2.x - b2.x;
     auto a21 = b1.y - a1.y; auto a22 = a2.y - b2.y;
@@ -289,46 +290,37 @@ void dfs(int v) {//MUST reverse printed cycle when orinted edges
     path.push_back(v);
 }
 // ******************************* Gauss *********************
-int n, m;//IN n - rows, m - cols
-real_t matr[maxn][maxn];//IN/OUT matr[N][M]. For Ax=B equation put B in m+1 col
-//if without B, replace <=m to <m (and u=m to u=m-1) (4 times total)
-int r;//OUT: count of non-zero rows after diag (rank)
-int adr[maxn];//id of non-null column in row
-bool used[maxn];//OUT: if column non-empty (i.e. var not free)
+int n, m;//IN n - rows (equations), m - cols (vars) (actually uses m+1 cols, extra for B)
+real_t matr[maxn][maxn];//IN/OUT matr[n][m+1]. For Ax=B equation put B in m+1 col, otherwise put 0
+int r;//OUT count of non-zero rows after diag (rank). rank(A)=rank(A^T). # solutions = 2^(n-rank)
+int adr[maxn];//OUT adr[n] id of non-null column in row
+bool used[maxn];//OUT used[m] if column non-empty (i.e. var not free)
 //if calc det, remember where do swap or normalization row
 //if integer modulo, remove EPS, divide modulo. If modulo=2, use bit ops
 //to invert write in matr 2n*n (A|E), and diag. Result will be (E|A^(-1))
-void Gauss() {//diagonalize matrix
-	int i, j, u;
+void Gauss() {//diagonalize matrix (O(N^3))
 	r = 0; //first row of remaining part
-	memset(used, 0, sizeof(used));
+	int i, j, u; memset(used, 0, sizeof(used));
 	for (i = 0; i <= m; ++i) {
 		int best = -1;
 		for (j = r; j < n; ++j) if (best < 0 || abs(matr[j][i]) > abs(matr[best][i])) best = j;
-		if (best < 0) break;//no rows left, stop
+		if (best < 0) continue;//no rows found, skip col
 		for (u = 0; u <= m; ++u) swap(matr[best][u], matr[r][u]);
 		if (abs(matr[r][i]) < EPS) continue;//current column is zero, skip it
 		for (u = m; u >= i; --u) matr[r][u] /= matr[r][i]; //norm row
 		for (j = 0; j < n; ++j) if (j != r) {
-				real_t coef = matr[j][i];
-				for (u = i; u <= m; ++u) matr[j][u] -= coef * matr[r][u];
+				real_t coef = matr[j][i]; for (u = i; u <= m; ++u) matr[j][u] -= coef * matr[r][u];
 			}//nullify all poses in column except of diagonal
 		//may ignore upper/lower to get trigonal matrix little bit faster
-		used[i] = true;
-		adr[r++] = i;
+		used[i] = true; adr[r++] = i;
 	}
 }
-real_t sol[maxn];//var values which is one of solutions (if exists any)
-bool GetSolution() {//uses matr which should be upper trigonal
-	int i, j;
-	memset(sol, 0, sizeof(sol));
-	if (used[m]) return false;//incompatible system
-	sol[m] = -1.0;    //MUST BE SO!
-	for (i = 0; i < m; ++i)
-		if (!used[i]) sol[i] = rand() / 32768.0; //free variables (any vals)
-	for (i = r - 1; i >= 0; --i)
-		for (j = adr[i] + 1; j <= n; ++j)
-			sol[adr[i]] -= sol[j] * matr[i][j];
+real_t sol[maxn];//OUT sol[m] var values which is one of solutions (if exists any)
+bool GetSolution() {//uses matr which should be upper trigonal O(N^2)
+	int i, j; memset(sol, 0, sizeof(sol)); if (used[m]) return false;//incompatible system
+	sol[m] = -1.0;    //MUST BE SO! (+ Bi * (-1))
+	for (i = 0; i < m; ++i) if (!used[i]) sol[i] = rand() / 32768.0; //free variables (any vals)
+	for (i = r - 1; i >= 0; --i) for (j = adr[i] + 1; j <= m; ++j) sol[adr[i]] -= sol[j] * matr[i][j];
 	return true;
 }
 // ******************************** LCA ********************************
@@ -370,8 +362,7 @@ void union_sets(int a, int b) {//join sets, which contain a and b
     a = find_set (a); b = find_set (b);
     if (a != b) {
         if (sz[a] < sz[b]) swap (a, b);
-        parent[b] = a;
-        sz[a] += sz[b];
+        parent[b] = a; sz[a] += sz[b];
     }
 }
 //given arr[0..2^bits-1]. Calc res[i] = sum(j submask of i)arr[j]. Stored in same arr. 
@@ -384,27 +375,27 @@ void sumOnSubsets(T* arr, int bits) {
     }
 }
 //CONVEX HULL TRICK: calculate min/max (ki*x+bi) on set lines (ki,bi) with convex hull idea
-//for min - MUST add in decreasing order by k, for max - increasing (draw to understand)
-template<bool rToL = false> //to add in reverse order, pass rToL = true
-struct CHT {
-    vector<line> lines;
-    vector<ll> ints; //ord numbers for lower bound
-    void add(const line& l) {
-        while (lines.size()>=2) {
-            double xl = inters(lines[Sz(lines)-2], lines[Sz(lines)-1]);
-            double xr = inters(lines[Sz(lines)-1], l);
-            if ((xl > xr && !rToL) || (xl < xr && rToL)) lines.pop_back(); else break;
-        }
-        ints.resize(lines.size()); ints.push_back(Sz(ints)); lines.push_back(l);
+//Builds upper hull (for max). For min add inverted lines (ki -> -ki, bi -> -bi)
+const line_t is_query = -INFll; struct Line { //line_t = long long is OK
+    line_t m, b; mutable function<const Line*()> nxt;
+    bool operator<(const Line& rhs) const {
+        if (rhs.b != is_query) return m < rhs.m; const Line* s = nxt();
+        if (!s) return 0; line_t x = rhs.m; return b - s->b < (s->m - m) * x;
     }
-    ll rq(ll x) {
-        assert(!lines.empty());
-        auto it = *lower_bound(ints.begin(), ints.end()-1, x,[this](ll id, ll x) {
-            if (!rToL) return inters(lines[id], lines[id+1]) < x;
-            else return inters(lines[id], lines[id+1]) > x;
-        });
-        return lines[it].f(x);
+};
+struct DynamicCHT : public multiset<Line> {
+    bool bad(iterator y) {
+        auto z = next(y); if (y == begin()) {
+            if (z == end()) return 0; return y->m == z->m && y->b <= z->b; }
+        auto x = prev(y); if (z == end()) return y->m == x->m && y->b <= x->b;
+        return (x->b - y->b)*(z->m - y->m) >= (y->b - z->b)*(y->m - x->m);
     }
+    void add(line_t m, line_t b) {
+        auto y = insert({ m, b }); y->nxt = [=] { return next(y) == end() ? 0 : &*next(y); };
+        if (bad(y)) { erase(y); return; } while (next(y) != end() && bad(next(y))) erase(next(y));
+        while (y != begin() && bad(prev(y))) erase(prev(y));
+    }
+    line_t query(line_t x) { auto l = *lower_bound((Line) { x, is_query }); return l.m * x + l.b; }
 };
 // **************************** maxflow:lift ****************************
 //IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
