@@ -1,15 +1,15 @@
 // ************************* Min-cost max-flow *************************
 struct edge {
-	int dest, back;//dest - vert to, back - id of reverse edge (actually id^1), 
+	int dest;//dest - vert to
 	flow_t f, c; dist_t w;//OUT f - edge flow, IN c - capacity, w - edge cost
 } edges[maxe];
 int cnt, n;//IN cnt - cnt edges. Set to 0 before use on other graph, IN n - cnt verts
 vector<int> g[maxn];//IN: g[v] - IDS of edges go from v
 
-void add_edge(int u, int v, int c, dist_t w) {
-	edges[cnt].dest = v; edges[cnt].back = cnt + 1;
+void add_edge(int u, int v, int c, dist_t w) {//^1 gets reverse edge number
+	edges[cnt].dest = v;
 	edges[cnt].f = 0; edges[cnt].c = c; edges[cnt].w = w; g[u].push_back(cnt);
-	edges[cnt + 1].dest = u; edges[cnt + 1].back = cnt; edges[cnt + 1].f = 0;
+	edges[cnt + 1].dest = u; edges[cnt + 1].f = 0;
 	edges[cnt + 1].c = 0; edges[cnt + 1].w = -w; g[v].push_back(cnt + 1); cnt += 2;
 }
 int was[maxn], prevE[maxn];//was[v] - if v visited, prevE[v] - id of backedge to v
@@ -26,10 +26,10 @@ bool dijk(int s, int t) {
 		if (mv == -1 || dist[mv] == inf) break;
 		was[mv] = 1;
 		for (j = 0; j < g[mv].size(); ++j) {
-			edge &e = edges[ g[mv][j] ];
+			int eid = g[mv][j]; edge &e = edges[eid];
 			if (!was[e.dest] && e.f < e.c && dist[e.dest] > dist[mv] + e.w + phi[mv] - phi[e.dest]) {
 				dist[e.dest] = dist[mv] + e.w + phi[mv] - phi[e.dest];
-				r[e.dest] = min(r[mv], e.c - e.f); prevE[e.dest] = e.back;
+				r[e.dest] = min(r[mv], e.c - e.f); prevE[e.dest] = eid^1;
 			}
 		}
 	}
@@ -38,7 +38,8 @@ bool dijk(int s, int t) {
 dist_t aug(int s, int t) {
 	flow_t rr = r[t]; dist_t ans = 0;
 	while (s != t) {
-		edge &e = edges[prevE[t]]; ans -= e.w * rr; e.f -= rr; edges[e.back].f += rr; t = e.dest;
+		int eid = prevE[t]; edge &e = edges[eid]; ans -= e.w * rr; e.f -= rr;
+		edges[eid^1].f += rr; t = e.dest;
 	}
 	return ans;
 }
