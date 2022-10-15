@@ -397,6 +397,18 @@ struct DynamicCHT : public multiset<Line> {
     }
     line_t query(line_t x) { auto l = *lower_bound((Line) { x, is_query }); return l.m * x + l.b; }
 };
+//Centroid decomposition
+int level[maxn], par[maxn]; //level: YOU MUST SET to -1 initially, OUT par - parent in centroid tree
+int dfs(int v, int size, int& center, int p = -1) {
+    int sum = 1; for (auto& it: g[v]) if (level[it]==-1 && it!=p) sum += dfs(it, size, center, v);
+    if (center == -1 && (2*sum >= size || p==-1)) center = v; return sum;
+}
+void build(int v, int size, int depth, int last) {
+    int center = -1; dfs(v, size, center); level[center] = depth; par[center] = last;
+    for (auto& it: g[v]) if (level[it] == -1) build(it, size/2, depth+1, center);
+}//After find centroid you may do some other computations in subtree (skip v, where level[v] != -1)
+build(0, n, 0, -1);
+//How to find second centroid: find first via dfs, and find its child, s. t. 2*sz[ch] == n
 // **************************** maxflow:lift ****************************
 //IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 int n, s, t; 
