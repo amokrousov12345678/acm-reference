@@ -403,7 +403,7 @@ int dfs(int v, int size, int& center, int p = -1) {
     int sum = 1; for (auto& it: g[v]) if (level[it]==-1 && it!=p) sum += dfs(it, size, center, v);
     if (center == -1 && (2*sum >= size || p==-1)) center = v; return sum;
 }
-void build(int v, int size, int depth, int last) {
+void build(int v, int size, int depth, int last) {//parent of root centroid = -1
     int center = -1; dfs(v, size, center); level[center] = depth; par[center] = last;
     for (auto& it: g[v]) if (level[it] == -1) build(it, size/2, depth+1, center);
 }//After find centroid you may do some other computations in subtree (skip v, where level[v] != -1)
