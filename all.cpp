@@ -301,16 +301,16 @@ bool used[maxn];//OUT used[m] if column non-empty (i.e. var not free)
 void Gauss() {//diagonalize matrix (O(N^3))
 	r = 0; //first row of remaining part
 	int i, j, u; memset(used, 0, sizeof(used));
-	for (i = 0; i <= m; ++i) {
+	for (i = 0; i <= m; ++i) {//do <m if several right parts or like this
 		int best = -1;
-		for (j = r; j < n; ++j) if (best < 0 || abs(matr[j][i]) > abs(matr[best][i])) best = j;
-		if (best < 0) continue;//no rows found, skip col
+		for (j = r; j < n; ++j) if (best < 0 || matr[j][i]) best = j;
+		if (best < 0) continue;//no rows found, skip col /*abs(matr[j][i]) > abs(matr[best][i])*/
 		for (u = 0; u <= m; ++u) swap(matr[best][u], matr[r][u]);
-		if (abs(matr[r][i]) < EPS) continue;//current column is zero, skip it
+		if (matr[r][i]==0) continue;//current column is zero, skip it /*abs(matr[r][i]) < EPS*/
 		for (u = m; u >= i; --u) matr[r][u] /= matr[r][i]; //norm row
-		for (j = 0; j < n; ++j) if (j != r) {
+		for (j = 0; j < n; ++j) if (j != r) {/*(matr[j][u] %= mod) AFTER ADD*/
 				real_t coef = matr[j][i]; for (u = i; u <= m; ++u) matr[j][u] -= coef * matr[r][u];
-			}//nullify all poses in column except of diagonal
+			}//nullify all poses in column except of diagonal,
 		//may ignore upper/lower to get trigonal matrix little bit faster
 		used[i] = true; adr[r++] = i;
 	}
@@ -318,8 +318,8 @@ void Gauss() {//diagonalize matrix (O(N^3))
 real_t sol[maxn];//OUT sol[m] var values which is one of solutions (if exists any)
 bool GetSolution() {//uses matr which should be upper trigonal O(N^2)
 	int i, j; memset(sol, 0, sizeof(sol)); if (used[m]) return false;//incompatible system
-	sol[m] = -1.0;    //MUST BE SO! (+ Bi * (-1))
-	for (i = 0; i < m; ++i) if (!used[i]) sol[i] = rand() / 32768.0; //free variables (any vals)
+	sol[m] = -1.0;    //MUST BE SO! (+ Bi * (-1)).
+	for (i = 0; i < m; ++i) if (!used[i]) sol[i] = 0;/*rand() / 32768.0*/; //free variables (any vals)
 	for (i = r - 1; i >= 0; --i) for (j = adr[i] + 1; j <= m; ++j) sol[adr[i]] -= sol[j] * matr[i][j];
 	return true;
 }
