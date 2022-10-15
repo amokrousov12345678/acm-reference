@@ -1,9 +1,9 @@
 // finds matching, not maximal with N / MOD probability (2e-6 on n=500);
-int mat[maxn][maxn], a[maxn][maxn], idx[maxn], iidx[maxn], has[maxn];//auxillary arrays
+int mat[maxn][maxn], a[maxn][maxn], idx[maxn], iidx[maxn], has[maxn], tmp[maxn];//auxillary arrays
 mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 uniform_int_distribution<> distr(1, mod - 1);
 //n - number of verts, ed - edges of graph (as pair of ends). Return edges in matching in same form
-vector<pair<int, int>> matching(int n, vector<pair<int, int>>& ed)
+vector<pair<int, int>> matching(int n, vector<pair<int, int>>& ed)//Doesn't fail with multiedges
 {
     for (int i=0;i<n;i++) {idx[i]=i; iidx[i]=i; has[i]=0;}
     for (auto e : ed)
@@ -12,7 +12,8 @@ vector<pair<int, int>> matching(int n, vector<pair<int, int>>& ed)
         if (u != -1 && v != -1) {int r = distr(rnd); mat[u][v] = r; mat[v][u] = mod - r;}
     }
     //inv considers matr as n*n. Return rank of matrix. If rank=n, set a=inv(matr).
-    int r = inv(n); int m = 2 * n - r; assert(r % 2 == 0);// May be done by gaussing (matr|E)
+    // May be done by gaussing (matr|E). GAUSS SHOULD EXPECT N=2*n, M=4*n
+    int r = inv(n); int m = 2 * n - r; assert(r % 2 == 0);
     if (m != n)
     {
         int t = 0;
