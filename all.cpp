@@ -459,6 +459,7 @@ flow_t pushRelabel() {//returns flow amount
 	return flow;
 }
 // *************************** maxflow:Dinits ***************************
+//Maxflow = mincut (dfs residue network from start (edges, where f<c)). Passed - S, T = V\S
 //IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
 int n, s, t; 
 flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
@@ -483,7 +484,7 @@ bool bfs() {
 }
 flow_t dfs (int v, flow_t flow) {
 	if (flow < minPushed) return 0;
-	if (v == t) return flow;
+	if (v == t) return flow;//aug path done
 	for (int &to = ptr[v]; to < n; ++to) {
 		if (d[to] != d[v] + 1)  continue;
 		flow_t pushed = dfs(to, min(flow, c[v][to] - f[v][to]));
