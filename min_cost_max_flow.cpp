@@ -4,7 +4,7 @@ struct edge {
 	flow_t f, c; dist_t w;//OUT f - edge flow, IN c - capacity, w - edge cost
 } edges[maxe];
 int cnt, n;//IN cnt - cnt edges. Set to 0 before use on other graph, IN n - cnt verts
-vector<int> g[maxn];//IN: g[v] - IDS of edges go from v
+vector<int> g[maxn];//IN: g[v] - IDS of edges go from v (ADD ONLY via add_edge)
 
 void add_edge(int u, int v, int c, dist_t w) {//^1 gets reverse edge number
 	edges[cnt].dest = v;
