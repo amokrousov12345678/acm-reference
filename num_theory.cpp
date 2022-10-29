@@ -89,3 +89,5 @@ ll chRem(const vector<ll>& rem, const vector<ll>& mod) {//NOT CHECKED!
     }
     return res;
 }
+//For 2 mods: R= (M2*inv(M2,M1))*R1 + (M1*inv(M1,M2))*R2 mod (R1*R2)
+//For 3 mods: R= (M2M3*inv(M2M3,M1))*R1+(M1M3*inv(M1M3,M2))*R2+(M1M2*inv(M1M2,M3))*R3
