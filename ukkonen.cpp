@@ -46,8 +46,7 @@ void make_tree() { // You MUST ensure to add '$' at the end of the string
 		for (oldr = root; test_and_split(v, k, i, s[i], r); canonize(v, k, i)) {
 			tree[r].next[numc(s[i])] = new_node(i, len);
 			if (oldr != root) tree[oldr].suff = r;
-			oldr = r;
-			v = tree[v].suff;
+			oldr = r; v = tree[v].suff;
 		}
 		if (oldr != root) tree[oldr].suff = r;
 		canonize(v, k, i + 1);
@@ -58,8 +57,7 @@ bool find_str(const char *st) {
 	for (int v = root, k = 0; *st; ++st) {
 		if (k >= tree[v].p) {
 			if (tree[v].next[numc(*st)] == -1)	 return false;
-			v = tree[v].next[numc(*st)];
-			k = tree[v].k;
+			v = tree[v].next[numc(*st)]; k = tree[v].k;
 		}
 		if (s[k++] != *st) return false;
 	}
