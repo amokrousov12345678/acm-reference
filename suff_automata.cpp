@@ -22,11 +22,11 @@ void extend(char c, int &last) {
 	for (p = last; p >= 0 && nodes[p].next[numc(c)] == -1; p = nodes[p].suff)
 		nodes[p].next[numc(c)] = nlast;
 	last = nlast;
-	if (p < 0) {
+	if (p < 0) {//len(max existing suf of s+c) = 0
 		nodes[nlast].suff = root;
 		return;
 	}
-	int q = nodes[p].next[numc(c)];
+	int q = nodes[p].next[numc(c)]; //len(max existing suf of s+c)=nodes[p].len+1
 	if (nodes[q].len == nodes[p].len + 1) {
 		nodes[nlast].suff = q;
 		return;
