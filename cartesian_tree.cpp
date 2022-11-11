@@ -54,7 +54,8 @@ Node* findByKey(Node* root, pkey_t key) {
     return key < root->pk ? findByKey(root->left, key) : findByKey(root->right, key);
 }
 Node* findByPos(Node* root, int pos) {
-    if (root==nullptr) return nullptr; int leftSz = size(root->left); push(root); if (pos==leftSz) return root;
+    if (root==nullptr) return nullptr; int leftSz = size(root->left); push(root);
+    if (pos==leftSz) return root;
     return pos < leftSz ? findByPos(root->left, pos) : findByPos(root->right, pos-leftSz-1);
 }
 //usable both in implicit and normal treap (for normal all left keys < all right keys)
@@ -72,10 +73,11 @@ Node* getLeftMost(Node* root) {if (root->left) return getLeftMost(root->left); e
 Node* insert(Node* root, Node* node) {//TRIVIAL WAY: merge(<x, merge(newItem, >=x))
     if (!root) return node; push(root);
     if (node->sk < root->sk) {
-        auto res = split(root, node->pk); node->left = res.first; node->right = res.second; return node;
+        auto res = split(root, node->pk); node->left = res.first; node->right = res.second;
+        recalc(node); return node;
     } else {
         if (node->pk < root->pk) root->left = insert(root->left, node);
-        else root->right = insert(root->right, node); return root;
+        else root->right = insert(root->right, node); recalc(root); return root;
     }
 }
 Node* erase(Node* root, pkey_t key) {//TRIVIAL WAY: split(x), merge(rootR->l, rootR->r), merge back
@@ -83,7 +85,7 @@ Node* erase(Node* root, pkey_t key) {//TRIVIAL WAY: split(x), merge(rootR->l, ro
     if (root->pk == key) return merge(root->left, root->right);
     else {
         if (key < root->pk) root->left = erase(root->left, node);
-        else root->right = erase(root->right, node); return root;
+        else root->right = erase(root->right, node); recalc(root); return root;
     }
 }
 //to apply group op: cut tree with segment and put change to root. MAGIC works
