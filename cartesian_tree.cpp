@@ -1,8 +1,8 @@
 //DONT FORGET to merge after split
 //Group ops are usable only for implicit treap, primary key - for not implicit.
 //Simple made persistent by creating new verts instead of modifying existing
-typedef int pkey_t; typedef int val_t;//pkey_t = key type, val_t = data key
-typedef int rng_t; typedef int pval_t; //rng_t = rand key, pval_t = push value
+using pkey_t = int; using val_t = int;//pkey_t = key type, val_t = data key
+using rng_t = int; using pval_t = int;//rng_t = rand key, pval_t = push value
 const static val_t neutral = 0; const static pval_t neutralPush = 0;
 struct Node {
     rng_t sk; int sz; //sk - rand key, sz - subtree sz
