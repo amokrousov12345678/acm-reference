@@ -328,7 +328,7 @@ bool GetSolution() {//uses matr which should be upper trigonal O(N^2)
 int n;//IN graph sz
 int h[maxn]; //IN distance from root
 int par[LOGmaxn/*+1*/][maxn];//IN par[0][x] - par of vert (par[0][root]=root
-void LCAInit() {//OUT par - lifts
+void LCAInit() {//OUT par - lifts. YOU MUST CALL IT BEFORE CALL LCA
 	for (int i = 1; i < LOGmaxn; ++i) {
 		for (int j = 0; j < n; ++j) {
 			par[i][j] = par[i - 1][par[i - 1][j]];
@@ -397,7 +397,8 @@ struct DynamicCHT : public multiset<Line> {
     }
     line_t query(line_t x) { auto l = *lower_bound((Line) { x, is_query }); return l.m * x + l.b; }
 };
-//Centroid decomposition
+//Centroid decomposition (Usually dynamic: mark something (some distance) on O(logN) ancestor centroids,
+//on each query traverse ancestor centroids and try to improve answer through them)
 int level[maxn], par[maxn]; //level: YOU MUST SET to -1 initially, OUT par - parent in centroid tree
 int dfs(int v, int size, int& center, int p = -1) {
     int sum = 1; for (auto& it: g[v]) if (level[it]==-1 && it!=p) sum += dfs(it, size, center, v);
@@ -405,7 +406,7 @@ int dfs(int v, int size, int& center, int p = -1) {
 }
 void build(int v, int size, int depth, int last) {//parent of root centroid = -1
     int center = -1; dfs(v, size, center); level[center] = depth; par[center] = last;
-    for (auto& it: g[v]) if (level[it] == -1) build(it, size/2, depth+1, center);
+    for (auto& it: g[center]) if (level[it] == -1) build(it, size/2, depth+1, center);
 }//After find centroid you may do some other computations in subtree (skip v, where level[v] != -1)
 build(0, n, 0, -1);
 //How to find second centroid: find first via dfs, and find its child, s. t. 2*sz[ch] == n
