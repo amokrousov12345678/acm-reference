@@ -6,7 +6,7 @@ struct edge {
 int cnt, n;//IN cnt - cnt edges. Set to 0 before use on other graph, IN n - cnt verts
 vector<int> g[maxn];//IN: g[v] - IDS of edges go from v (ADD ONLY via add_edge)
 
-void add_edge(int u, int v, int c, dist_t w) {//^1 gets reverse edge number
+void add_edge(int u, int v, flow_t c, dist_t w) {//^1 gets reverse edge number
 	edges[cnt].dest = v;
 	edges[cnt].f = 0; edges[cnt].c = c; edges[cnt].w = w; g[u].push_back(cnt);
 	edges[cnt + 1].dest = u; edges[cnt + 1].f = 0;
@@ -19,20 +19,18 @@ bool dijk(int s, int t) {
 	int i, j;
 	for (i = 0; i < n; ++i) dist[i] = inf;
 	memset(was, 0, sizeof(int) * n); memset(r, 0, sizeof(int) * n);
-	dist[s] = 0; r[s] = inf;
-	for (i = 0; i < n; ++i) {
-		int mv = -1;
-		for (j = 0; j < n; ++j) if (!was[j] && (mv == -1 || dist[mv] > dist[j])) mv = j;
-		if (mv == -1 || dist[mv] == inf) break;
-		was[mv] = 1;
-		for (j = 0; j < g[mv].size(); ++j) {
-			int eid = g[mv][j]; edge &e = edges[eid];
-			if (!was[e.dest] && e.f < e.c && dist[e.dest] > dist[mv] + e.w + phi[mv] - phi[e.dest]) {
-				dist[e.dest] = dist[mv] + e.w + phi[mv] - phi[e.dest];
-				r[e.dest] = min(r[mv], e.c - e.f); prevE[e.dest] = eid^1;
-			}
-		}
-	}
+	dist[s] = 0; r[s] = inf; priority_queue<pair<dist_t, int>> q; q.push({0,s});
+	while (!q.empty()) {//O(N^2) dinitz may be better on dense graphs
+        auto it = q.top(); q.pop(); if (dist[it.second]!=-it.first) continue;
+        int mv = it.second; was[mv] = 1;
+        for (j = 0; j < g[mv].size(); ++j) {
+            int eid = g[mv][j]; edge &e = edges[eid];
+            if (!was[e.dest] && e.f < e.c && dist[e.dest] > dist[mv] + e.w + phi[mv] - phi[e.dest]) {
+                dist[e.dest] = dist[mv] + e.w + phi[mv] - phi[e.dest]; q.push({-dist[e.dest], e.dest});
+                r[e.dest] = min(r[mv], e.c - e.f); prevE[e.dest] = eid^1;
+            }
+        }
+    }
 	return r[t] > 0;/*r[t] >= eps*/
 }
 dist_t aug(int s, int t) {
