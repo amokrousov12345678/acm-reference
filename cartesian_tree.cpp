@@ -84,8 +84,8 @@ Node* erase(Node* root, pkey_t key) {//TRIVIAL WAY: split(x), merge(rootR->l, ro
     assert(root); push(root);
     if (root->pk == key) return merge(root->left, root->right);
     else {
-        if (key < root->pk) root->left = erase(root->left, node);
-        else root->right = erase(root->right, node); recalc(root); return root;
+        if (key < root->pk) root->left = erase(root->left, key);
+        else root->right = erase(root->right, key); recalc(root); return root;
     }
 }
 //to apply group op: cut tree with segment and put change to root. MAGIC works
