@@ -461,56 +461,63 @@ flow_t pushRelabel() {//returns flow amount
 }
 // *************************** maxflow:Dinits ***************************
 //Maxflow = mincut (dfs residue network from start (edges, where f<c)). Passed - S, T = V\S
-//IN n - verts cnt, c[u][v] - (u,v) capactity, s - source, t - target
-int n, s, t; 
-flow_t c[maxn][maxn];//for val_t with float point, use logic with eps
+int cnt, n; //IN cnt - cnt edges. Set to 0 before use on other graph, IN n - cnt verts
+struct edge {
+	int dest;//dest - vert to
+	flow_t f, c; //OUT f - edge flow, IN c - capacity
+} edges[maxe];
+vector<int> g[maxn];//IN: g[v] - IDS of edges go from v (ADD ONLY via add_edge)
 //O(V^2*E), O(E*sqrtV) on unit network (matching)
 flow_t minPushed = 1;//INTERNAL min flow we can push through edge now. MUST BE >0
 //(1 for int, eps for real, or changed automatically if dinicScale called)
-flow_t f[maxn][maxn]; //OUT (u,v) flow
 int d[maxn], ptr[maxn], q[maxn];
-bool bfs() {
-	int qh=0, qt=0;
-	q[qt++] = s;
-	memset(d, -1, n * sizeof(d[0]));
-	d[s] = 0;
+void add_edge(int u, int v, flow_t c) {//^1 gets reverse edge number
+	edges[cnt].dest = v; edges[cnt].f = 0; edges[cnt].c = c; g[u].push_back(cnt);
+	edges[cnt + 1].dest = u; edges[cnt + 1].f = 0;
+	edges[cnt + 1].c = 0; g[v].push_back(cnt + 1); cnt += 2;
+}
+bool bfs(int s, int t) {
+	int qh=0, qt=0; q[qt++] = s; memset(d, -1, n * sizeof(d[0])); d[s] = 0;
 	while (qh < qt) {
 		int v = q[qh++];
-		for (int to = 0; to < n; ++to) if (d[to] == -1 && f[v][to] + minPushed <= c[v][to]) {
-			q[qt++] = to;
-			d[to] = d[v] + 1;
-		}
+        for (auto& eid: g[v]) {
+            auto& e = edges[eid];
+            if (d[e.dest] == -1 && e.f + minPushed <= e.c) {
+                q[qt++] = e.dest; d[e.dest] = d[v] + 1;
+            }
+        }
 	}
 	return d[t] != -1;
 }
-flow_t dfs (int v, flow_t flow) {
+flow_t dfs (int v, int t, flow_t flow) {
 	if (flow < minPushed) return 0;
 	if (v == t) return flow;//aug path done
-	for (int &to = ptr[v]; to < n; ++to) {
-		if (d[to] != d[v] + 1)  continue;
-		flow_t pushed = dfs(to, min(flow, c[v][to] - f[v][to]));
+	for (int &curPtr = ptr[v]; curPtr < n; ++curPtr) {
+        auto eid = g[v][curPtr]; auto& e = edges[eid]; auto& eRev = edges[eid^1];
+		if (d[e.dest] != d[v] + 1) continue;
+		flow_t pushed = dfs(e.dest, t, min(flow, e.c - e.f));
 		if (pushed >= minPushed) {
-			f[v][to] += pushed;
-			f[to][v] -= pushed;
+			e.f += pushed;
+			eRev.f -= pushed;
 			return pushed;
 		}
 	}
 	return 0;
 }
-flow_t dinic(bool doClean = true) {//returns flow amount. doClean - should we reset f[i][j]
+flow_t dinic(int s, int t, bool doClean = true) {//returns flow amount. doClean - should we reset f[i][j]
 	if (doClean) for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
 	flow_t flow = 0;
 	for (;;) {
-		if (!bfs()) break;
+		if (!bfs(s, t)) break;
 		memset(ptr, 0, n * sizeof ptr[0]);
-		while (flow_t pushed = dfs (s, INF)) flow += pushed;
+		while (flow_t pushed = dfs (s, t, INF)) flow += pushed;
 	}
 	return flow;
 }
-flow_t dinicScale() {//returns flow amount, uses SCALING IDEA, modifies minPushed
+flow_t dinicScale(int s, int t) {//returns flow amount, uses SCALING IDEA, modifies minPushed
 	minPushed = INF; flow_t flow = 0;
 	while (minPushed) { /*minPushed > eps*/
-		flow += dinic(false); minPushed /= 2;
+		flow += dinic(s, t, false); minPushed /= 2;
 	}
 	return flow;
 }
