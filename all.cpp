@@ -492,7 +492,7 @@ bool bfs(int s, int t) {
 flow_t dfs (int v, int t, flow_t flow) {
 	if (flow < minPushed) return 0;
 	if (v == t) return flow;//aug path done
-	for (int &curPtr = ptr[v]; curPtr < n; ++curPtr) {
+	for (int &curPtr = ptr[v]; curPtr < Sz(g[v]); ++curPtr) {
         auto eid = g[v][curPtr]; auto& e = edges[eid]; auto& eRev = edges[eid^1];
 		if (d[e.dest] != d[v] + 1) continue;
 		flow_t pushed = dfs(e.dest, t, min(flow, e.c - e.f));
@@ -505,7 +505,7 @@ flow_t dfs (int v, int t, flow_t flow) {
 	return 0;
 }
 flow_t dinic(int s, int t, bool doClean = true) {//returns flow amount. doClean - should we reset f[i][j]
-	if (doClean) for (int i=0;i<n;i++) for (int j=0;j<n;j++) f[i][j] = 0;
+	if (doClean) for (int i=0;i<cnt;i++) edges[i].f = 0;
 	flow_t flow = 0;
 	for (;;) {
 		if (!bfs(s, t)) break;
