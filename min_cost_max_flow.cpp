@@ -18,7 +18,7 @@ flow_t r[maxn]; dist_t dist[maxn], phi[maxn];//r[v] - min cap of path to v
 bool dijk(int s, int t) {
 	int i, j;
 	for (i = 0; i < n; ++i) dist[i] = inf;
-	memset(was, 0, sizeof(int) * n); memset(r, 0, sizeof(int) * n);
+	memset(was, 0, sizeof(was[0]) * n); memset(r, 0, sizeof(r[0]) * n);
 	dist[s] = 0; r[s] = inf; priority_queue<pair<dist_t, int>> q; q.push({0,s});
 	while (!q.empty()) {//O(N^2) dinitz may be better on dense graphs
         auto it = q.top(); q.pop(); if (dist[it.second]!=-it.first) continue;
