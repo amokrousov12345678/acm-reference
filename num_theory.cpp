@@ -67,7 +67,7 @@ ll ext_gcd(ll a, ll b, ll& x, ll& y) {
     ll x1, y1; ll d = ext_gcd(b%a, a, x1, y1);
     x = y1 - (b / a) * x1; y = x1;
     return d;
-}
+}//ext_gcd(a, M, x) returns a^-1 (mod M), if gcd=1
 //ax+by=c. Return false - no solution, true - series X=x+k*dx, Y=y+k*dy, k in Z
 bool solveDiofant(ll a, ll b, ll c, ll& x, ll& y, ll& dx, ll& dy) {
     ll _x, _y; ll gcd = ext_gcd(a,b,_x,_y);
@@ -78,16 +78,16 @@ bool solveDiofant(ll a, ll b, ll c, ll& x, ll& y, ll& dx, ll& dy) {
 }
 //system of equations x=rem[i] (mod mod[i]) with PAIRWISE COPRIME mod[i]
 //return R, s.t. X=R (mod (product mod[i] by i)) equivalent to system
-ll chRem(const vector<ll>& rem, const vector<ll>& mod) {//NOT CHECKED!
+ll chRem(const vector<ll>& rem, const vector<ll>& mod) {
     ll res = 0; assert(rem.size()==mod.size());
     ll M = 1;
     for (int i=0;i<Sz(mod);i++) M *= mod[i];
     for (int i=0;i<Sz(mod);i++) {
-        ll Mi = M/mod[i]; ll invMi = mod_inv(Mi, mod[i]);
+        ll Mi = M/mod[i]; ll invMi = mod_inv(Mi, mod[i]);//for mod_inv use ext_gcd
         ll tmp = mul(rem[i], mul(Mi, invMi, M), M);
         res = add(res, tmp, M);
     }
-    return res;
+    res %= M; if (res<0) res+=M; return res;
 }
 //For 2 mods: R= (M2*inv(M2,M1))*R1 + (M1*inv(M1,M2))*R2 mod (R1*R2)
 //For 3 mods: R= (M2M3*inv(M2M3,M1))*R1+(M1M3*inv(M1M3,M2))*R2+(M1M2*inv(M1M2,M3))*R3
