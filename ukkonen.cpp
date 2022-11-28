@@ -25,7 +25,6 @@ bool test_and_split(int v, int k, int p, char c, int &r) {
 	tree[nx].k += p - k;
 	return true;
 }
-
 void canonize(int& v, int& k, int p) {
 	while (k < p) {
 		int nx = tree[v].next[numc(s[k])];
@@ -34,7 +33,6 @@ void canonize(int& v, int& k, int p) {
 		v = nx;
 	}
 }
-
 void make_tree() { // You MUST ensure to add '$' at the end of the string
 	int oldr, v, k, p, i, len = strlen(s), r;
 	cnt = 0;

@@ -22,13 +22,6 @@ struct hash_pair { //to allow unordered_map<pair<int, int>, bool, hash_pair>
 	template <class T1, class T2> size_t operator()(const pair<T1, T2>& p) const {
 		auto hash1 = hash<T1>{}(p.first); auto hash2 = hash<T2>{}(p.second); return hash1 ^ hash2;}};
 // __builtin_popcount
-#include <ext/pb_ds/assoc_container.hpp> // Main file
-#include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
-using namespace __gnu_pbds;
-typedef tree<int, __gnu_pbds::null_type, less<int>, __gnu_pbds::rb_tree_tag, 
-		__gnu_pbds::tree_order_statistics_node_update>
-        ordered_set; //find_by_order and order_of_key
-uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
 
 std::random_device rd; std::mt19937 rng{rd()}; std::mt19937 randMT(rng);//uniform int [a;b]
 int blessRng(int a, int b) { std::uniform_int_distribution<int> rang(a, b); return rang(randMT);}
@@ -61,3 +54,15 @@ assert(mpos <= MAX_MEM); return (void *)res; }; inline void operator delete ( vo
 //L1 (|x|+|y|) metric with replace x'=x+y, y'=x-y transformed to Linf (max(|x|,|y|))
 System.setIn(new FileInputStream("input.txt"));//LONG ARITHM, BigInteger immutable)
 Scanner scanner = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
+
+#include <ext/rope> //alternative for treap from STL (works on GCC)
+using namespace __gnu_cxx; rope<int> v(n, 0); //rope<int> v(n) DOESN'T WORK AS EXPECTED
+//.substr(l, len) .insert(l, seg) .erase(l, len) .mutable_reference_at(pos) .mutable_begin .mutable_end
+
+#include <ext/pb_ds/assoc_container.hpp> // Main file for ordered set
+#include <ext/pb_ds/tree_policy.hpp> // Contains tree_order_statistics_node_update
+using namespace __gnu_pbds;
+typedef tree<int, __gnu_pbds::null_type, less<int>, __gnu_pbds::rb_tree_tag, 
+		__gnu_pbds::tree_order_statistics_node_update>
+        ordered_set; //find_by_order and order_of_key (0-based, don't work as multiset)
+uset.max_load_factor(hashTableLoadRate); //0.25 for faster shesh tables
