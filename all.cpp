@@ -1,3 +1,7 @@
+const double phiPlus1 = (1+sqrt(5))/2+1; double delta=(r-l)/phiPlus1; double m1 = lv+delta,m2=rv-delta;
+double fm1=f(m1), fm2=f(m2);//golden ratio ternary (for min)
+for (int i=0;i<it;i++) {if (fy1<fy2) {r=m2; delta=(r-l)/phiPlus1; m2=m1; fm2=fm1;m1=l+delta;fm1=f(m1);}
+else {l=m1; delta=(r-l)/phiPlus1; m1=m2; fm1=fm2; m2=r-delta; fm2=f(m2);}}
 // ***************** Fast IO (noticeably faster than cin/cout)**********
 //Printf/scanf almost no profit agains cin/cout with sync_with_stdio
 #include <cstdio>
@@ -61,13 +65,10 @@ inline void setLine(dword *arr, int l, int r) {
 }
 // **************************** all submasks ***************************
 for (int s = m; ;s = (s - 1) & m) {
-    do_smth(s);
-    if (!s) break;
+    do_smth(s); if (!s) break;
 }
-
 //***************************** Geometry *******************
-template<typename T>
-struct PointT { //integer point
+template<typename T> struct PointT {
     T x, y;
     inline PointT() : x(0), y(0) {}
     inline PointT(T _x, T _y) : x(_x), y(_y) {}
@@ -146,7 +147,6 @@ bool inTriangle(const Point &p, const Point &a, const Point &b, const Point &c, 
 	tv -= t; t = abs(vect(p - c, a - c)); if (strict && !t) return false;
 	tv -= t; return tv >= 0;
 }
-
 // determines whether point <p> lies inside polygon <arr[0], ..., arr[n]>
 // no self-crossings! But may be non-convex. May have equal points	arr[0] = arr[n]
 bool inPolygon(const Point &p, int n, const Point *arr, bool strict = false) {
